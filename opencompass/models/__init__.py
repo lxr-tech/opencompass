@@ -48,3 +48,7 @@ from .yayi_api import Yayi  # noqa: F401
 from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
+
+from .light_cache.light_cache_wrapper import LightCacheCausalLM
+from .huggingface_long import HuggingFaceModel
+from .turbomind_long import TurboMindModelLong

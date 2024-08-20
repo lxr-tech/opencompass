@@ -1,7 +1,9 @@
-from datasets import Dataset, load_dataset
+from datasets import Dataset  #, load_dataset
 
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.utils.internal.load_dataset import \
+    load_local_dataset as load_dataset
 
 from ..base import BaseDataset
 
@@ -11,8 +13,9 @@ class LongBenchvcsumDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
-        kwargs['data_files'] = get_data_path(kwargs['data_files'],
-                                             local_mode=True)
+        if 'data_files' in kwargs:
+            kwargs['data_files'] = get_data_path(kwargs['data_files'],
+                                                local_mode=True)
         dataset = load_dataset(**kwargs)
         split = 'test'
         raw_data = []

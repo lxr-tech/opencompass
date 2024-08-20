@@ -139,6 +139,11 @@ context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860
 needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, '1000k')
 
 
+depths_list = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+context_lengths = [32000, 100000, 200000, 300000, 400000, 500000, 600000, 800000, 1000000, ]  # 
+needlebench_summarizer = create_summarizer(context_lengths, depths_list, '1M')
+
+
 _needlebench_8k_parallel_en_batch1 = []
 _needlebench_8k_parallel_en_batch5 = []
 _needlebench_8k_parallel_en_batch10 = []

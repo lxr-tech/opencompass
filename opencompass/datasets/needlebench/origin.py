@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
@@ -88,6 +89,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             if language == 'Chinese':
                 if position == 'End':
+                    retrieval_question = retrieval_question.replace("请按照'", '')[:-16]
                     prompt = ('你是一个善于回答用户问题的智能AI助手\n'
                               '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
                               '，或重复你的回答\n'
@@ -104,6 +106,7 @@ class NeedleBenchOriginDataset(BaseDataset):
                                      'Position must be "End" or "Start".')
             elif language == 'English':
                 if position == 'End':
+                    retrieval_question = retrieval_question.replace("Please answer in the format '", '')[:-10]
                     prompt = ('You are an intelligent AI assistant skilled in '
                               'answering user questions.\n'
                               'Please keep your answers concise and clear. Do '
@@ -128,35 +131,19 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             return prompt
 
-        repo_id = 'opencompass/NeedleBench'
-        file_names = [
-            'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
-            'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
-            'zh_movie.jsonl', 'zh_tech.jsonl'
-        ]
-
-        downloaded_files = []
-        base_file_path = ''
-        for file_name in file_names:
-            file_path = hf_hub_download(repo_id=repo_id,
-                                        filename=file_name,
-                                        repo_type='dataset')
-            downloaded_files.append(file_path)
-            base_file_path = '/'.join(file_path.split('/')[:-1])
-
-        for file_path in downloaded_files:
-            if file_path.split('/')[-1] not in file_list:
+        files = Path(path).glob('*.jsonl')
+        for file in files:
+            if file.name not in file_list:
                 continue
-            with open(file_path, 'r', encoding='utf-8') as f:
+
+            with open(file, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-                needle_file_path = os.path.join(base_file_path,
-                                                needle_file_name)
-                random_needle = get_random_line_by_language(
-                    counter, needle_file_path, language)
+                needle_file_path = os.path.join(path, needle_file_name)
+                random_needle = get_random_line_by_language(counter, file_path=needle_file_path, language=language)
                 needle = '\n' + random_needle['needle'] + '\n'
                 retrieval_question = random_needle['retrieval_question']
                 keyword = random_needle['keyword']
@@ -189,6 +176,68 @@ class NeedleBenchOriginDataset(BaseDataset):
             'answer': data['answer'],
         })
         return dataset
+
+        # repo_id = 'opencompass/NeedleBench'
+        # file_names = [
+        #     'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
+        #     'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
+        #     'zh_movie.jsonl', 'zh_tech.jsonl'
+        # ]
+
+        # downloaded_files = []
+        # base_file_path = ''
+        # for file_name in file_names:
+        #     file_path = hf_hub_download(repo_id=repo_id,
+        #                                 filename=file_name,
+        #                                 repo_type='dataset')
+        #     downloaded_files.append(file_path)
+        #     base_file_path = '/'.join(file_path.split('/')[:-1])
+
+        # for file_path in downloaded_files:
+        #     if file_path.split('/')[-1] not in file_list:
+        #         continue
+        #     with open(file_path, 'r', encoding='utf-8') as f:
+        #         lines_bak = [json.loads(line.strip()) for line in f]
+        #     lines = lines_bak.copy()
+        #     for counter in range(num_repeats_per_file):
+        #         random.seed(counter)
+        #         random.shuffle(lines)
+        #         needle_file_path = os.path.join(base_file_path,
+        #                                         needle_file_name)
+        #         random_needle = get_random_line_by_language(
+        #             counter, needle_file_path, language)
+        #         needle = '\n' + random_needle['needle'] + '\n'
+        #         retrieval_question = random_needle['retrieval_question']
+        #         keyword = random_needle['keyword']
+
+        #         context_length = length - length_buffer
+        #         target_length_per_record = context_length - len(
+        #             _get_tokens_from_context(needle))
+        #         target_length_per_record = max(target_length_per_record, 0)
+        #         accumulated_tokens = []
+        #         for line in lines:
+        #             tokens_current_line = _get_tokens_from_context(
+        #                 line['text'])
+        #             accumulated_tokens.extend(tokens_current_line)
+
+        #             if len(accumulated_tokens) >= target_length_per_record:
+        #                 break
+
+        #         processed_text = _generate_context(
+        #             accumulated_tokens[:target_length_per_record], depth,
+        #             needle)
+
+        #         processed_prompt = _generate_prompt(processed_text,
+        #                                             retrieval_question)
+
+        #         data['prompt'].append(processed_prompt)
+        #         data['answer'].append(needle + '*' + keyword)
+
+        # dataset = Dataset.from_dict({
+        #     'prompt': data['prompt'],
+        #     'answer': data['answer'],
+        # })
+        # return dataset
 
 
 class NeedleBenchOriginEvaluator(BaseEvaluator):

@@ -74,7 +74,7 @@ dataset_mapping_dict = {}
 
 needle_counts = ['2', '3', '4', '5']
 languages = ['en', 'zh']
-sizes = ['4k', '8k', '32k', '128k', '200k', '256k', '1000k']
+sizes = ['4k', '8k', '32k', '128k', '200k', '256k', '1000k', '1M']
 types = ['origin', 'parallel']
 
 for needle_count in needle_counts:
@@ -192,7 +192,7 @@ def save_results_to_plots(txt_results_save_path):
     numbers = [2, 3, 4, 5]
     languages = ['en', 'zh']
     size_exists = []
-    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k', '_256k', '_1000k']
+    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k', '_256k', '_1000k', '_1M']
 
     for size in sizes_origin:
         if size in content:
@@ -225,11 +225,11 @@ def save_results_to_plots(txt_results_save_path):
 
             model_datasets_scores[dataset_abbr] = '{:.02f}'.format(score)
 
-        overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
-        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
-        merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
-        averaged_df = calculate_elementwise_average(model_name, merged_df)
-        overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
+        # overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
+        # overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
+        # merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
+        # averaged_df = calculate_elementwise_average(model_name, merged_df)
+        # overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
 
         # Single-Retrieval
         single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.png')
@@ -249,7 +249,7 @@ def save_results_to_plots(txt_results_save_path):
         multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df)
         multi_reasoning_overall_score = visualize(multi_reasoning_averaged_df, multi_reasoning_score_pic_path, model_name, 'Multi-Reasoning Overall Score')
 
-        model_scores[model_name] = averaged_df
+        # model_scores[model_name] = averaged_df
     remove_empty_subfolders(plot_path)
     return model_scores
 
@@ -271,98 +271,190 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         model_df = df[['Document Depth', 'Context Length',
                         model_name]].copy()
         model_df.rename(columns={model_name: 'Score'}, inplace=True)
-        pivot_table = pd.pivot_table(model_df,
-                                    values='Score',
-                                    index=['Document Depth'],
-                                    columns=['Context Length'],
-                                    aggfunc='mean')
 
+        # Create pivot table
+        pivot_table = pd.pivot_table(model_df,
+                                        values='Score',
+                                        index=['Document Depth'],
+                                        columns=['Context Length'],
+                                        aggfunc='mean')
+
+        # Calculate mean scores
         mean_scores = pivot_table.mean().values
+
+        # Calculate overall score
         overall_score = mean_scores.mean()
-        plt.figure(figsize=(10, 6))
+
+        # Create heatmap and line plot
+        plt.figure(figsize=(15.5, 8), dpi=300)
         ax = plt.gca()
         cmap = LinearSegmentedColormap.from_list(
             'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
 
-        sns.heatmap(pivot_table,
+        # Draw heatmap
+        tmp_ax = sns.heatmap(pivot_table,
                     cmap=cmap,
                     ax=ax,
+                    cbar_kws={'label': 'Score'},
                     vmin=0,
                     vmax=100)
-        cbar = ax.collections[0].colorbar
+        tmp_ax.figure.axes[-1].yaxis.label.set_size(18)
+        # print(dir(tmp_ax.figure.axes[-1]))
+        # print(dir(tmp_ax.figure.axes[-1].yaxis))
+        # tmp_ax.figure.axes[-1].yticks.set_size(16)
+        tmp_ax.figure.axes[-1].set_yticklabels(tmp_ax.figure.axes[-1].get_yticklabels(), 
+                                               rotation=0, fontsize=16)
+
+        # Set line plot data
         x_data = [i + 0.5 for i in range(len(mean_scores))]
         y_data = mean_scores
 
+        # Create twin axis for line plot
         ax2 = ax.twinx()
+        # Draw line plot
         ax2.plot(x_data,
-                y_data,
-                color='white',
-                marker='o',
-                linestyle='-',
-                linewidth=2,
-                markersize=8,
-                label='Average Depth Score'
-                )
-        for x_value, y_value in zip(x_data, y_data):
-            ax2.text(x_value, y_value, f'{y_value:.2f}', ha='center', va='top')
-
+                    y_data,
+                    color='white',
+                    marker='o',
+                    linestyle='-',
+                    linewidth=2,
+                    markersize=8,
+                    label='Average Depth Score')
+        # Set y-axis range
         ax2.set_ylim(0, 100)
 
+        # Hide original y-axis ticks and labels
         ax2.set_yticklabels([])
         ax2.set_yticks([])
 
-        ax2.legend(loc='lower left')
+        # Add legend
+        ax2.legend(loc='upper left', fontsize=16)
 
-        if model_name in model_name_mapping:
-            title_name = model_name_mapping[model_name]
-        else:
-            title_name = model_name
-
-        ax.set_title(title_name, fontsize=12, fontweight='bold', pad=15)
-
-        if dataset_type in dataset_mapping_dict:
-            dataset_name = dataset_mapping_dict[dataset_type]
-        else:
-            dataset_name = dataset_type
-
-        ax.text(0.5, 1.005, f'{dataset_name}:{overall_score:.2f}',
-                transform=ax.transAxes,
-                ha='center',
-                fontsize=12,
-                fontweight='normal')
-        ax.set_xlabel('Token Length', fontsize=13, fontweight='normal', labelpad=1)
-        ax.set_ylabel('Depth Percent(%)', fontsize=13, fontweight='normal', labelpad=1)
-        converted_labels = [convert_to_k(value) for value in pivot_table.columns.values]
-
-        ax.tick_params(axis='both', which='major', length=1, pad=1)
-        ax.tick_params(axis='both', which='minor', length=1, pad=1)
-        ax.set_xticklabels(converted_labels, rotation=45)
-        index_length = len(pivot_table.index)
-
-        selected_indices = pivot_table.index.values[::2]
-        labels = [str(int(index)) for index in selected_indices]
-        ax.set_yticks(np.arange(0, len(pivot_table.index), 2))
-        ax.set_yticklabels(labels, rotation=0)
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-        for spine in ax2.spines.values():
-            spine.set_visible(False)
+        # Set chart title and labels
+        # ax.set_title(f'{model_name} {dataset_type} Context '
+        #                 'Performance\nFact Retrieval Across '
+        #                 'Context Lengths ("Needle In A Haystack")', fontsize=18)
+        ax.set_xlabel('Token Limit', fontsize=18)
+        ax.set_ylabel('Depth Percent', fontsize=18)
+        ax.set_xticklabels(pivot_table.columns.values, rotation=0, fontsize=16)
+        ax.set_yticklabels(pivot_table.index.values, rotation=0, fontsize=16)
+        # Add overall score as a subtitle
+        # plt.text(0.5,
+        #          -0.13, f'Overall Score for {model_name}: '
+        #          f'{overall_score:.2f}',
+        #          ha='center',
+        #          va='center',
+        #          transform=ax.transAxes,
+        #          fontsize=18)
+        ax.set_title(f'Overall Score: {overall_score:.2f}', fontsize=18, pad=10)
 
         plt.tight_layout()
+        plt.subplots_adjust(right=1.066)
         plt.draw()
-        directory_path, original_filename = os.path.split(save_path)
-
-        filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
-        new_filename = f'{filename_suffix}.png'
-
-        new_save_path = os.path.join(directory_path, new_filename)
-
-        plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
-        print(f'Saved: {new_save_path}')
-
-        plt.close()
-
+        save_path = save_path.split('.')
+        save_path[-1] = 'pdf'
+        save_path = '.'.join(save_path)
+        plt.savefig(save_path)
+        print(f'Saved :{save_path}')
+        plt.close()  # Close figure to prevent memory leaks
     return overall_score
+
+    # for model_name in model_columns[1:]:
+    #     model_df = df[['Document Depth', 'Context Length',
+    #                     model_name]].copy()
+    #     model_df.rename(columns={model_name: 'Score'}, inplace=True)
+    #     pivot_table = pd.pivot_table(model_df,
+    #                                 values='Score',
+    #                                 index=['Document Depth'],
+    #                                 columns=['Context Length'],
+    #                                 aggfunc='mean')
+
+    #     mean_scores = pivot_table.mean().values
+    #     overall_score = mean_scores.mean()
+    #     plt.figure(figsize=(10, 6))
+    #     ax = plt.gca()
+    #     cmap = LinearSegmentedColormap.from_list(
+    #         'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
+
+    #     sns.heatmap(pivot_table,
+    #                 cmap=cmap,
+    #                 ax=ax,
+    #                 vmin=0,
+    #                 vmax=100)
+    #     cbar = ax.collections[0].colorbar
+    #     x_data = [i + 0.5 for i in range(len(mean_scores))]
+    #     y_data = mean_scores
+
+    #     ax2 = ax.twinx()
+    #     ax2.plot(x_data,
+    #             y_data,
+    #             color='white',
+    #             marker='o',
+    #             linestyle='-',
+    #             linewidth=2,
+    #             markersize=8,
+    #             label='Average Depth Score'
+    #             )
+    #     for x_value, y_value in zip(x_data, y_data):
+    #         ax2.text(x_value, y_value, f'{y_value:.2f}', ha='center', va='top')
+
+    #     ax2.set_ylim(0, 100)
+
+    #     ax2.set_yticklabels([])
+    #     ax2.set_yticks([])
+
+    #     ax2.legend(loc='lower left')
+
+    #     if model_name in model_name_mapping:
+    #         title_name = model_name_mapping[model_name]
+    #     else:
+    #         title_name = model_name
+
+    #     ax.set_title(title_name, fontsize=12, fontweight='bold', pad=15)
+
+    #     if dataset_type in dataset_mapping_dict:
+    #         dataset_name = dataset_mapping_dict[dataset_type]
+    #     else:
+    #         dataset_name = dataset_type
+
+    #     ax.text(0.5, 1.005, f'{dataset_name}:{overall_score:.2f}',
+    #             transform=ax.transAxes,
+    #             ha='center',
+    #             fontsize=12,
+    #             fontweight='normal')
+    #     ax.set_xlabel('Token Length', fontsize=13, fontweight='normal', labelpad=1)
+    #     ax.set_ylabel('Depth Percent(%)', fontsize=13, fontweight='normal', labelpad=1)
+    #     converted_labels = [convert_to_k(value) for value in pivot_table.columns.values]
+
+    #     ax.tick_params(axis='both', which='major', length=1, pad=1)
+    #     ax.tick_params(axis='both', which='minor', length=1, pad=1)
+    #     ax.set_xticklabels(converted_labels, rotation=45)
+    #     index_length = len(pivot_table.index)
+
+    #     selected_indices = pivot_table.index.values[::2]
+    #     labels = [str(int(index)) for index in selected_indices]
+    #     ax.set_yticks(np.arange(0, len(pivot_table.index), 2))
+    #     ax.set_yticklabels(labels, rotation=0)
+    #     for spine in ax.spines.values():
+    #         spine.set_visible(False)
+    #     for spine in ax2.spines.values():
+    #         spine.set_visible(False)
+
+    #     plt.tight_layout()
+    #     plt.draw()
+    #     directory_path, original_filename = os.path.split(save_path)
+
+    #     filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
+    #     new_filename = f'{filename_suffix}.png'
+
+    #     new_save_path = os.path.join(directory_path, new_filename)
+
+    #     plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
+    #     print(f'Saved: {new_save_path}')
+
+    #     plt.close()
+
+    # return overall_score
 
 
 def ensure_directory(path):
@@ -386,6 +478,10 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
             df.rename(columns={score_column: dataset_abbr}, inplace=True)
 
         dfs.append(df)
+
+    # print('dfs', dfs)
+    # print('dataset_abbrs', dataset_abbrs)
+    # print('parsed_data', parsed_data)
 
     from functools import reduce
     merged_df = reduce(lambda left, right: pd.merge(left, right, on='dataset', how='outer'), dfs)

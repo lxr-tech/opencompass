@@ -1,4 +1,6 @@
-from datasets import Dataset, load_dataset
+from datasets import Dataset  # , load_dataset
+from opencompass.utils.internal.load_dataset import \
+    load_local_dataset as load_dataset
 
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
