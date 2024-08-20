@@ -15,7 +15,7 @@ class LongBenchvcsumDataset(BaseDataset):
     def load(**kwargs):
         if 'data_files' in kwargs:
             kwargs['data_files'] = get_data_path(kwargs['data_files'],
-                                                local_mode=True)
+                                                 local_mode=True)
         dataset = load_dataset(**kwargs)
         split = 'test'
         raw_data = []
