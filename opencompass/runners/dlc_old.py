@@ -4,7 +4,6 @@ import os
 import os.path as osp
 import random
 import re
-import json
 import subprocess
 import sys
 import time
@@ -95,7 +94,6 @@ class DLCRunner(BaseRunner):
         Returns:
             tuple[str, int]: Task name and exit code.
         """
-        logger = get_logger()
         if random_sleep is None:
             random_sleep = (self.max_num_workers > 32)
 
@@ -167,26 +165,9 @@ class DLCRunner(BaseRunner):
 
             shell_cmd += f'cd {pwd}; '
             shell_cmd += '{task_cmd}'
-            shell_cmd = f"bash -c \"{shell_cmd}\" "
-            if self.preemptible:
-                tmpl = (f'/cpfs01/shared/public/llm-env-test/conda_env/python_dlc_env/bin/python {self.aliyun_cfg["ali_submit_dlc_path"]}'
-                        f" --task_mode submit_task"
-                        f" --job_name {task_name[:512]}" 
-                        f" --command '{shell_cmd}'"
-                        f" --resource_id={self.aliyun_cfg['resource_id']}"
-                        f" --data_sources={self.aliyun_cfg['data_sources']}"
-                        f" --dlc_config_path {self.aliyun_cfg['dlc_config_path']}"
-                        " --workers 1"
-                        f" --worker_cpu {max(num_gpus * 6, 8)}"
-                        f" --worker_gpu {num_gpus}"
-                        f" --worker_memory {max(num_gpus * 64, 48)}Gi"
-                        f" --worker_image {self.aliyun_cfg['worker_image']}"
-                        f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                        f" --worker_shared_memory {max(num_gpus * 64, 48)}Gi"
-                        " --preemptible true"
-                        f" --priority {self.priority}")
-                
-            else:
+            shell_cmd = f"bash -c \"{shell_cmd}\""
+
+            if self.preemptible is False:
                 tmpl = ('/cpfs01/shared/public/dlc submit pytorchjob'
                         f" --command '{shell_cmd}'"
                         f' --name {task_name[:512]}'
@@ -201,15 +182,43 @@ class DLCRunner(BaseRunner):
                         f" --worker_image {self.aliyun_cfg['worker_image']}"
                         " --interactive"
                         f" --priority {self.priority}")
+            else:
+                # tmpl = ('/cpfs01/shared/public/dlc submit pytorchjob'
+                #         f" --command '{shell_cmd}'"
+                #         f' --name {task_name[:512]}'
+                #         f' --resource_id {self.aliyun_cfg["resource_id"]}'
+                #         f' --data_sources {self.aliyun_cfg["data_sources"]}'
+                #         f" -c {self.aliyun_cfg['dlc_config_path']}"
+                #         f" --workspace_id {self.aliyun_cfg['workspace_id']}"
+                #         ' --workers 1'
+                #         f' --worker_cpu {max(num_gpus * 6, 8)}'
+                #         f' --worker_gpu {num_gpus}'
+                #         f' --worker_memory {max(num_gpus * 64, 48)}Gi'
+                #         f" --worker_image {self.aliyun_cfg['worker_image']}"
+                #         f" --oversold_type {self.preemptible}"
+                #         " --interactive")
 
-                
+                tmpl = ('/cpfs01/shared/public/llm-env-test/conda_env/python_dlc_env/bin/python /cpfs01/user/liuxiaoran/projects/LongScore/xrliu/run_ali_task.py'
+                        f" --job_name {task_name[:512]}" 
+                        f" --command '{shell_cmd}'"
+                        f" --resource_id={self.aliyun_cfg['resource_id']}"
+                        f" --data_sources={self.aliyun_cfg['data_sources']}"
+                        " --workers 1"
+                        f" --worker_cpu {max(num_gpus * 6, 8)}"
+                        f" --worker_gpu {num_gpus}"
+                        f" --worker_memory {max(num_gpus * 64, 48)}Gi"
+                        f" --worker_image {self.aliyun_cfg['worker_image']}"
+                        f" --workspace_id {self.aliyun_cfg['workspace_id']}"
+                        f" --worker_shared_memory {max(num_gpus * 64, 48)}Gi"
+                        " --preemptible true"
+                        f" --priority {self.priority}")
 
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
             cmd = get_cmd()
 
-            
+            logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
             # Run command with retry
@@ -229,24 +238,18 @@ class DLCRunner(BaseRunner):
                 while index_to_start < num_retry_to_start:
                     index_to_start += 1
                     output = subprocess.getoutput(cmd)
-                    if self.preemptible:
-                        output = str(output).strip()
-                        job_id = output
+                    match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
+                    if match is None:
+                        stdout.write('Failed to get job id from output:')
+                        stdout.write(output)
+                        if index_to_start < num_retry_to_start:
+                            stdout.write(f'Retry #{index_to_start} starting')
+                        time.sleep(2)
+                        continue
+                    else:
+                        job_id = match.group(1)
                         stdout.write(output)
                         break
-                    else:
-                        match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
-                        if match is None:
-                            stdout.write('Failed to get job id from output:')
-                            stdout.write(output)
-                            if index_to_start < num_retry_to_start:
-                                stdout.write(f'Retry #{index_to_start} starting')
-                            time.sleep(2)
-                            continue
-                        else:
-                            job_id = match.group(1)
-                            stdout.write(output)
-                            break
                 else:
                     raise RuntimeError(f'Cannot get job id from {output}')
 
@@ -260,28 +263,10 @@ class DLCRunner(BaseRunner):
                         time.sleep(2)
                         raw_job_info = ""
                         try:
-                            if self.preemptible:
-                                
-                                raw_job_info = subprocess.getoutput(f'/cpfs01/shared/public/llm-env-test/conda_env/python_dlc_env/bin/python  {self.aliyun_cfg["ali_submit_dlc_path"]} --task_mode get_task_info --dlc_config_path {self.aliyun_cfg["dlc_config_path"]} --job_id {job_id}')
-                                
-                                raw_job_info = json.loads(raw_job_info)
-                                Status = "Running"
-                                if raw_job_info["Status"] == "JobSucceeded":
-                                    Status = "Succeeded"
-                                if raw_job_info["Status"] == "JobFailed":
-                                    Status = "Failed"
-                                job_info = {
-                                    "Status": Status,
-                                    "GmtCreateTime": raw_job_info["GmtCreateTime"]
-                                }
-                                logger.debug(f"raw_job_info: {raw_job_info}")
-                                logger.debug(f"job_info: {job_info}")
-                                
-                            else:
-                                raw_job_info = subprocess.getoutput(f'/cpfs01/shared/public/dlc get job {job_id} -c {self.aliyun_cfg["dlc_config_path"]}')
-                                if raw_job_info.startswith("/bin/bash") or raw_job_info.startswith("[OK]") or raw_job_info.startswith("[FAILED]"):
-                                    raw_job_info = raw_job_info[raw_job_info.index("\n") + 1:] 
-                                job_info = json.loads(raw_job_info)
+                            raw_job_info = subprocess.getoutput(f'/cpfs01/shared/public/dlc get job {job_id} -c {self.aliyun_cfg["dlc_config_path"]}')
+                            if raw_job_info.startswith("/bin/bash") or raw_job_info.startswith("[OK]") or raw_job_info.startswith("[FAILED]"):
+                               raw_job_info = raw_job_info[raw_job_info.index("\n") + 1:] 
+                            job_info = json.loads(raw_job_info)
                             break
                         except Exception as e:  # noqa: E722
                             # raise RuntimeError(f'Failed to get job info for {job_id}\n/cpfs01/shared/public/dlc get job {job_id} -c {self.aliyun_cfg["dlc_config_path"]} \
