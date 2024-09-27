@@ -6,11 +6,11 @@ from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
-from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 
 def get_random_line_by_language(counter, file_path, language):
@@ -37,7 +37,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,  # depreciated
+        path: str,
         length: int,
         depth: int,
         tokenizer_model: str,

@@ -175,6 +175,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/mmlu",
         "local": "./data/mmlu/",
     },
+    # MMLU_PRO
+    "opencompass/mmlu_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmlu_pro",
+    },
     # NQ
     "opencompass/natural_question": {
         "ms_id": "opencompass/natural_question",
@@ -203,7 +209,7 @@ DATASETS_MAPPING = {
     "opencompass/race": {
         "ms_id": "opencompass/race",
         "hf_id": "opencompass/race",
-        "local": "./data/race",
+        "local": "./data/race/",
     },
     # SIQA
     "opencompass/siqa": {
@@ -229,6 +235,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/summedits",
         "local": "./data/summedits/summedits.jsonl",
     },
+    # SuperGLUE
+    "opencompass/boolq": {
+        "ms_id": "opencompass/boolq",
+        "hf_id": "opencompass/boolq",
+        "local": "./data/SuperGLUE/BoolQ/val.jsonl",
+    },
     # TriviaQA
     "opencompass/trivia_qa": {
         "ms_id": "opencompass/trivia_qa",
@@ -253,6 +265,18 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/xsum",
         "local": "./data/Xsum/dev.jsonl",
     },
+    # Longbench
+    "opencompass/Longbench": {
+        "ms_id": "",
+        "hf_id": "THUDM/LongBench",
+        "local": "./data/Longbench",
+    },
+    # Needlebench
+    "opencompass/needlebench": {
+        "ms_id": "",
+        "hf_id": "opencompass/needlebench",
+        "local": "./data/needlebench",
+    }
 }
 
 DATASETS_URL = {
@@ -292,10 +316,6 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/BBH.zip",
         "md5": "60c49f9bef5148aa7e1941328e96a554",
     },
-    "/mmlu/": {
-        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip",
-        "md5": "761310671509a239e41c4b717f7fab9c",
-    },
     "/compass_arena/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/compass_arena.zip",
         "md5": "cd59b54a179d16f2a858b359b60588f6",
@@ -319,6 +339,14 @@ DATASETS_URL = {
     "/humaneval/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval.zip",
         "md5": "88b1b89dc47b7121c81da6bcd85a69c3",
+    },
+    "/humanevalx": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humanevalx.zip",
+        "md5": "22930355c03fb73fb5bae14b50f1deb9",
+    },
+    "/ds1000_data": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ds1000_data.zip",
+        "md5": "1a4990aec04a2fd73ccfad12e2d43b43",
     },
     "/drop_simple_eval/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/drop_simple_eval.zip",
@@ -355,5 +383,49 @@ DATASETS_URL = {
     "/ruler/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ruler.zip",
         "md5": "c60bdfff3d02358067104cc1dea7c0f7",
+    },
+    "/scicode": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/scicode.zip",
+        "md5": "9c6c64b8c70edc418f713419ea39989c",
+    },
+    "/commonsenseqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/commonsenseqa.zip",
+        "md5": "c4a82fc07c81ae1462605f5d7fd2bb2e",
+    },
+    "FewCLUE": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/FewCLUE.zip",
+        "md5": "7976e2bb0e9d885ffd3c55f7c5d4021e",
+    },
+    "/race": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/race.zip",
+        "md5": "b758251764a264746cf45749c02363f9",
+    },
+    "/ARC": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ARC.zip",
+        "md5": "d720629b69f1a51cfe78bf65b00b44f6",
+    },
+    "/SuperGLUE": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SuperGLUE.zip",
+        "md5": "b60904915b0b61d1a04ea52280169936",
+    },
+    "SQuAD2.0": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SQuAD2.0.zip",
+        "md5": "1321cbf9349e1102a57d31d1b2bfdd7e",
+    },
+    "mmlu_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
+        "md5": "e3200c7380f4cea5f13c768f2815fabb",
+    },
+    "/Longbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Longbench.zip",
+        "md5": "ab0cb9e520ae5cfb899bf38b564249bb",
+    },
+    "/needlebench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/needlebench.zip",
+        "md5": "b546da0397746eaff4d3ff0f20d6ede2",
+    },
+    "/teval": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/teval.zip",
+        "md5": "7628ab5891a26bf96ca17becfd044867",
     },
 }
