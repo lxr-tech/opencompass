@@ -20,6 +20,7 @@
 import math
 from typing import List, Optional, Tuple, Union
 
+import os
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
@@ -48,7 +49,7 @@ from transformers.utils import (
 )
 from transformers import LlamaConfig
 
-from .cache_utils import Cache, DynamicCache
+from .cache_utils_v0921 import Cache, DynamicCache
 
 logger = logging.get_logger(__name__)
 
@@ -139,9 +140,10 @@ class LlamaRotaryEmbedding(nn.Module):
             self.max_seq_len_cached = self.original_max_seq_len
 
     @torch.no_grad()
-    def forward(self, x):
-        seq_len = x.shape[2]
-        position_ids = torch.arange(seq_len)[None, :].float().to(device=x.device)
+    def forward(self, x, position_ids=None):
+        if position_ids == None:
+            seq_len = x.shape[2]
+            position_ids = torch.arange(seq_len)[None, :].float().to(device=x.device)
         
         if "dynamic" in self.rope_type:
             self._dynamic_frequency_update(position_ids, device=x.device)
@@ -326,11 +328,6 @@ class LlamaAttention(nn.Module):
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
         
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
         bsz, q_len, _ = hidden_states.size()
 
         if self.config.pretraining_tp > 1:
@@ -361,16 +358,16 @@ class LlamaAttention(nn.Module):
 
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
-        if self.config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
-        if self.config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
 
         key_states = repeat_kv(key_states, self.num_key_value_groups)
@@ -439,12 +436,6 @@ class LlamaFlashAttention2(LlamaAttention):
 
         output_attentions = False
         
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
-
         bsz, q_len, _ = hidden_states.size()
 
         query_states = self.q_proj(hidden_states)
@@ -458,19 +449,23 @@ class LlamaFlashAttention2(LlamaAttention):
         key_states = key_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
         value_states = value_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
 
+        # print(f'\tlayer_idx = {self.layer_idx}, device = {query_states.device}, kv update start', flush=True)
+
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
+
+        # print(f'\tlayer_idx = {self.layer_idx}, device = {query_states.device}, kv update end', flush=True)
 
         # TODO: These transpose are quite inefficient but Flash Attention requires the layout [batch_size, sequence_length, num_heads, head_dim]. We would need to refactor the KV cache
         # to be able to avoid many of these transpose/reshape/view.

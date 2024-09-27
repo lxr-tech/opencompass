@@ -19,7 +19,7 @@ class RulerCweDataset(BaseDataset):
         max_seq_length: int = 4096,
         tokenizer_model: str = 'gpt-4',
         template:
-        str = 'Below is a numbered list of words. In these words, some appear more often than others. Memorize the ones that appear most often.\n{context}\nQuestion: What are the 10 most common words in the above list? Answer: The top 10 words that appear most often in the list are:',
+        str = 'Below is a numbered list of words. In these words, some appear more often than others. Memorize the ones that appear most often.\n{context}\nQuestion: What are the {num_cw} most common words in the above list? Answer: The top {num_cw} words that appear most often in the list are:',
         tokens_to_generate: int = 120,
         freq_cw: int = 30,
         freq_ucw: int = 3,
@@ -84,12 +84,14 @@ class RulerCweDataset(BaseDataset):
 
             input_example = template.format(
                 context=context_example,
+                num_cw=num_cw, 
                 query='',
             ) + ' '.join(
                 [f'{i + 1}. {word}' for i, word in enumerate(answer_example)])
 
             input_text = template.format(
                 context=context,
+                num_cw=num_cw, 
                 query='',
             )
 

@@ -1002,10 +1002,10 @@ class ChatGLMForConditionalGeneration(ChatGLMPreTrainedModel):
         # only last token for input_ids if past is not None
         if position_ids is None:
             position_ids = self.get_position_ids(input_ids, device=input_ids.device)
-        if not is_first_forward:
-            if past_key_values is not None:
-                position_ids = position_ids[..., -1:]
-                input_ids = input_ids[:, -1:]
+        # if not is_first_forward:
+        if past_key_values is not None:
+            position_ids = position_ids[..., -1:]
+            input_ids = input_ids[:, -1:]
         return {
             "input_ids": input_ids,
             "past_key_values": past_key_values,

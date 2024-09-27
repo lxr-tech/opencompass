@@ -1,5 +1,5 @@
 
-from opencompass.models.light_cache.light_cache_wrapper import LightCacheCausalLM
+from opencompass.models.xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
 
 import torch
 import numpy as np

@@ -61,6 +61,15 @@ niah_configurations = [
         'num_needle_v': 1,
         'num_needle_q': 1,
     },
+    # {
+    #     'abbr': 'multikey_uuids_in_essay',
+    #     'type_haystack': 'essay',
+    #     'type_needle_k': 'uuids',
+    #     'type_needle_v': 'uuids',
+    #     'num_needle_k': 1,
+    #     'num_needle_v': 1,
+    #     'num_needle_q': 1,
+    # },
     {
         'abbr': 'multivalue',
         'type_haystack': 'essay',

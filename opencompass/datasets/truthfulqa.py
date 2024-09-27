@@ -1,3 +1,6 @@
+import os
+import time
+
 import evaluate
 import numpy as np
 import torch
@@ -6,8 +9,25 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils.internal.load_dataset import load_local_dataset
 
 from .base import BaseDataset
+
+
+class TruthfulQADatasetForMC(BaseDataset):
+
+    @staticmethod
+    def load(**kwargs):
+        dataset = load_local_dataset(**kwargs)
+
+        def preprocess(example):
+            for i in range(4):
+                example[chr(ord('A') + i)] = example['choices'][i]
+            return example
+
+        dataset = dataset.map(preprocess).remove_columns(['choices'])
+        return dataset
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

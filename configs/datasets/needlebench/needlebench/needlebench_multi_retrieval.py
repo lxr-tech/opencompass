@@ -52,7 +52,7 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = [7200, 32000, 50000, ]  # 100000, 200000, 300000, 400000, 500000, 600000, 800000, 1000000, 700000, 150000, 250000, 350000, 500000
+context_lengths = [32000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, ]  #  900000, 1000000, 48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 

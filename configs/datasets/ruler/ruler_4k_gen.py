@@ -5,6 +5,7 @@ with read_base():
     from .ruler_vt_gen import vt_datasets  # VT
     from .ruler_fwe_gen import fwe_datasets  # FWE
     from .ruler_cwe_gen import cwe_datasets  # CWE
+    from .ruler_cwe4_gen import cwe4_datasets  # CWE
     from .ruler_qa_gen import qa_datasets  # QA
 
 

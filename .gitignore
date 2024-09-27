@@ -1,5 +1,6 @@
 .DS_Store
 output_*/
+outputs_*
 outputs/
 scripts/
 icl_inference_output/

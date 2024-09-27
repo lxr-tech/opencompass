@@ -52,13 +52,14 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = [32000, ]  # 100000, 200000, 300000, 400000, 500000, 600000, 800000, 1000000,  48000, 16000, 50000, 800000, 500000, 700000, 150000, 250000, 350000, 500000
-depths_list = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
+context_lengths = [32000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 1250000, ]  #  1500000,48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
+# context_lengths = [800000, 1000000]
+depths_list = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
 
 base_path = './data/needlebench_v2'
 file_list = ['en_un_asr.jsonl']  # PaulGrahamEssays 
 needlebench_en_datasets = []
-needle_file_name = 'needles.jsonl'
+needle_file_name = 'needles_xrliu.jsonl'
 
 for original_context_length in context_lengths:
     for depth_percent in depths_list:
@@ -84,7 +85,7 @@ for original_context_length in context_lengths:
 
 file_list = ['zh_all.jsonl']  # zh_finance
 needlebench_zh_datasets = []
-needle_file_name = 'needles.jsonl'
+needle_file_name = 'needles_xrliu.jsonl'
 
 for original_context_length in context_lengths:
     for depth_percent in depths_list:

@@ -87,6 +87,7 @@ class RulerNiahDataset(BaseDataset):
         # Positions
         DEPTHS = list(
             np.round(np.linspace(0, 100, num=40, endpoint=True)).astype(int))
+        # DEPTHS = list(np.random.rand(40) * 100)
 
         def _generate_random_number(num_digits=7):
             lower_bound = 10**(num_digits - 1)

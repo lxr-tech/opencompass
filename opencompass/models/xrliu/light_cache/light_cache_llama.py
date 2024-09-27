@@ -47,7 +47,7 @@ from transformers.utils import (
 )
 from transformers import LlamaConfig
 
-from .cache_utils import Cache, DynamicCache
+from .cache_utils_v0921 import Cache, DynamicCache
 
 
 if is_flash_attn_2_available():
@@ -103,34 +103,27 @@ class LlamaRotaryEmbedding(nn.Module):
         self.register_buffer("inv_freq", inv_freq, persistent=False)
         # For BC we register cos and sin cached
         self.max_seq_len_cached = max_position_embeddings
-        self.cur_seq_len = 0
-        self.sin, self.cos = None, None
 
     ################# begin # remove input_ids #################
     @torch.no_grad()
-    def forward(self, x):
-        # x: [bs, num_attention_heads, seq_len, head_size]
-        seq_len = x.shape[2]
-        if seq_len >= self.cur_seq_len:
-            del self.cos
-            del self.sin
-            self.cur_seq_len = seq_len
-            inv_freq_expanded = self.inv_freq[None, :, None].float().expand(x.shape[0], -1, 1)
-            position_ids_expanded = torch.arange(seq_len)[None, None, :].float().to(device=inv_freq_expanded.device)
-            # Force float32 since bfloat16 loses precision on long contexts
-            # See https://github.com/huggingface/transformers/pull/29285
-            device_type = x.device.type
-            device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
-            with torch.autocast(device_type=device_type, enabled=False):
-                freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
-                emb = torch.cat((freqs, freqs), dim=-1)
-                cos = emb.cos()
-                sin = emb.sin()
-            self.cos = cos.to(dtype=x.dtype)
-            self.sin = sin.to(dtype=x.dtype)
-            return self.cos, self.sin 
-        else:
-            return self.cos[:, :seq_len, :], self.sin[:, :seq_len, :]
+    def forward(self, x, position_ids=None):
+        if position_ids == None:
+            seq_len = x.shape[2]
+            position_ids = torch.arange(seq_len)[None, :].float().to(device=x.device)
+            
+        inv_freq_expanded = self.inv_freq[None, :, None].float().expand(x.shape[0], -1, 1)
+        position_ids_expanded = position_ids[:, None, :].float().to(device=inv_freq_expanded.device)
+        # position_ids_expanded = torch.arange(seq_len)[None, None, :].float().to(device=inv_freq_expanded.device)
+        # Force float32 since bfloat16 loses precision on long contexts
+        # See https://github.com/huggingface/transformers/pull/29285
+        device_type = x.device.type
+        device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
+        with torch.autocast(device_type=device_type, enabled=False):
+            freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+            emb = torch.cat((freqs, freqs), dim=-1)
+            cos = emb.cos()
+            sin = emb.sin()
+        return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
     ################## end ## remove input_ids #################
 
 
@@ -138,11 +131,14 @@ class LlamaLinearScalingRotaryEmbedding(LlamaRotaryEmbedding):
     """LlamaRotaryEmbedding extended with linear scaling. Credits to the Reddit user /u/kaiokendev"""
 
     ################# begin # remove input_ids #################
-    def forward(self, x):
+    def forward(self, x, position_ids=None):
         # difference to the original RoPE: a scaling factor is aplied to the position ids
-        seq_len = x.shape[2]
+        if position_ids == None:
+            seq_len = x.shape[2]
+            position_ids = torch.arange(seq_len)[None, :].float().to(device=x.device)
+
         inv_freq_expanded = self.inv_freq[None, :, None].float().expand(x.shape[0], -1, 1)
-        position_ids_expanded = torch.arange(seq_len)[None, None, :].float().to(device=inv_freq_expanded.device) / self.scaling_factor
+        position_ids_expanded = position_ids[:, None, :].float().to(device=inv_freq_expanded.device) / self.scaling_factor
         # Force float32 since bfloat16 loses precision on long contexts
         # See https://github.com/huggingface/transformers/pull/29285
         device_type = x.device.type
@@ -160,7 +156,7 @@ class LlamaDynamicNTKScalingRotaryEmbedding(LlamaRotaryEmbedding):
     """LlamaRotaryEmbedding extended with Dynamic NTK scaling. Credits to the Reddit users /u/bloc97 and /u/emozilla"""
 
     ################# begin # remove input_ids #################
-    def forward(self, x):
+    def forward(self, x, position_ids=None):
         # difference to the original RoPE: inv_freq is recomputed when the sequence length > original length
         seq_len = x.shape[2]
         if seq_len > self.max_position_embeddings:
@@ -170,7 +166,28 @@ class LlamaDynamicNTKScalingRotaryEmbedding(LlamaRotaryEmbedding):
             inv_freq = 1.0 / (base ** (torch.arange(0, self.dim, 2, dtype=torch.int64).float().to(x.device) / self.dim))
             self.register_buffer("inv_freq", inv_freq, persistent=False)  # TODO joao: this may break with compilation
 
-        cos, sin = super().forward(x)
+        cos, sin = super().forward(x, position_ids)
+        return cos, sin
+    ################## end ## remove input_ids #################
+
+
+class LlamaScalingNTKScalingRotaryEmbedding(LlamaRotaryEmbedding):
+    """LlamaRotaryEmbedding extended with NTK scaling based on https://arxiv.org/abs/2310.05209. """
+
+    ################# begin # remove input_ids #################
+    def forward(self, x, position_ids=None):
+        # difference to the original RoPE: inv_freq is recomputed when the sequence length > original length
+        seq_len = x.shape[2] if position_ids == None else int(position_ids.max())
+        if seq_len > self.max_position_embeddings:
+            # order = math.ceil(math.log(seq_len / (2 * math.pi), self.max_position_embeddings / (2 * math.pi)))
+            # base = (self.base ** order) ** (self.dim / (self.dim - 2))
+            dim_c = math.log(self.max_position_embeddings / (2 * math.pi), self.base)
+            dim_c = 2 * math.ceil(self.dim * dim_c / 2)
+            base = (seq_len / (2 * math.pi)) ** (self.dim / (dim_c - 2))
+            inv_freq = 1.0 / (base ** (torch.arange(0, self.dim, 2, dtype=torch.int64).float().to(x.device) / self.dim))
+            self.register_buffer("inv_freq", inv_freq, persistent=False)  # TODO joao: this may break with compilation
+
+        cos, sin = super().forward(x, position_ids)
         return cos, sin
     ################## end ## remove input_ids #################
 
@@ -305,7 +322,7 @@ class LlamaAttention(nn.Module):
             )
         else:
             scaling_type = self.config.rope_scaling["type"]
-            scaling_factor = self.config.rope_scaling["factor"]
+            scaling_factor = self.config.rope_scaling["factor"] if "factor" in self.config.rope_scaling else 1
             if scaling_type == "linear":
                 self.rotary_emb = LlamaLinearScalingRotaryEmbedding(
                     self.head_dim,
@@ -315,6 +332,13 @@ class LlamaAttention(nn.Module):
                 )
             elif scaling_type == "dynamic":
                 self.rotary_emb = LlamaDynamicNTKScalingRotaryEmbedding(
+                    self.head_dim,
+                    max_position_embeddings=self.max_position_embeddings,
+                    scaling_factor=scaling_factor,
+                    base=self.rope_theta,
+                )
+            elif scaling_type == "scaling":
+                self.rotary_emb = LlamaScalingNTKScalingRotaryEmbedding(
                     self.head_dim,
                     max_position_embeddings=self.max_position_embeddings,
                     scaling_factor=scaling_factor,
@@ -335,12 +359,6 @@ class LlamaAttention(nn.Module):
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
         
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
-
         bsz, q_len, _ = hidden_states.size()
 
         if self.config.pretraining_tp > 1:
@@ -371,16 +389,16 @@ class LlamaAttention(nn.Module):
 
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
         if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
         if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
 
         key_states = repeat_kv(key_states, self.num_key_value_groups)
@@ -447,12 +465,6 @@ class LlamaFlashAttention2(LlamaAttention):
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
 
         output_attentions = False
-        
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
 
         bsz, q_len, _ = hidden_states.size()
 
@@ -469,16 +481,16 @@ class LlamaFlashAttention2(LlamaAttention):
 
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
 
         # key_states = repeat_kv(key_states, self.num_key_value_groups)
