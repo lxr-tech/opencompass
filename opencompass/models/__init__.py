@@ -51,7 +51,42 @@ from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
 
-from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
-from .xrliu.huggingface_long import HuggingFaceModel
-from .xrliu.turbomind_long import TurboMindModelLong
-from .xrliu.turbomind_short import TurboMindModelShort
+try:
+    from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
+except:
+    pass
+try:
+    from .xrliu.huggingface_long import HuggingFaceModel
+except:
+    pass
+try:
+    from .xrliu.turbomind_long import TurboMindModelLong
+except:
+    pass
+try:
+    from .xrliu.turbomind_short import TurboMindModelShort
+except:
+    pass
+
+try:
+    from .zgliu.llama2_h2o import Llama2_H2O
+    from .zgliu.llama2_snapkv import Llama2_SnapKV
+    from .zgliu.llama2_streamingllm import Llama2_StreamingLLM
+except:
+    pass
+try:
+    from .zgliu.infllm_model import INFLLM_LlamaForCausalLM
+except:
+    pass
+try:
+    from .zgliu.kivi_model import KIVI_LlamaForCausalLM
+except:
+    pass
+try:
+    from .zgliu.lightcache_model import LightCache_MossHuaweiForCausalLM
+except:
+    pass
+try:
+    from .zgliu.rag_context_model import RAG_CONTEXT_LlamaForCausalLM
+except:
+    pass
