@@ -42,7 +42,7 @@ from transformers.utils import (
 )
 from transformers import Qwen2Config
 
-from .cache_utils import Cache, DynamicCache
+from .cache_utils_v0921 import Cache, DynamicCache
 
 
 if is_flash_attn_2_available():
@@ -101,33 +101,26 @@ class Qwen2RotaryEmbedding(nn.Module):
         inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2, dtype=torch.int64).float().to(device) / self.dim))
         self.register_buffer("inv_freq", inv_freq, persistent=False)
 
-        # Build here to make `torch.jit.trace` work.
-        self._set_cos_sin_cache(
-            seq_len=max_position_embeddings, device=self.inv_freq.device, dtype=torch.get_default_dtype()
-        )
+    ################# begin # remove input_ids #################
+    @torch.no_grad()
+    def forward(self, x, position_ids=None):
+        if position_ids == None:
+            seq_len = x.shape[2]
+            position_ids = torch.arange(seq_len)[None, :].float().to(device=x.device)
 
-    def _set_cos_sin_cache(self, seq_len, device, dtype):
-        self.max_seq_len_cached = seq_len
-        t = torch.arange(self.max_seq_len_cached, device=device, dtype=torch.int64).type_as(self.inv_freq)
-
-        freqs = torch.outer(t, self.inv_freq)
-        # Different from paper, but it uses a different permutation in order to obtain the same calculation
-        emb = torch.cat((freqs, freqs), dim=-1)
-        self.register_buffer("cos_cached", emb.cos().to(dtype), persistent=False)
-        self.register_buffer("sin_cached", emb.sin().to(dtype), persistent=False)
-
-    ################# begin # unify seq_len #################
-    def forward(self, x):
-        # x: [bs, num_attention_heads, seq_len, head_size]
-        seq_len = x.shape[2]
-        if seq_len > self.max_seq_len_cached:
-            self._set_cos_sin_cache(seq_len=seq_len, device=x.device, dtype=x.dtype)
-
-        return (
-            self.cos_cached[:seq_len].to(dtype=x.dtype),
-            self.sin_cached[:seq_len].to(dtype=x.dtype),
-        )
-    ################## end ## unify seq_len #################
+        inv_freq_expanded = self.inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1)
+        position_ids_expanded = position_ids[:, None, :].float()
+        # Force float32 since bfloat16 loses precision on long contexts
+        # See https://github.com/huggingface/transformers/pull/29285
+        device_type = x.device.type
+        device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
+        with torch.autocast(device_type=device_type, enabled=False):
+            freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+            emb = torch.cat((freqs, freqs), dim=-1)
+            cos = emb.cos()
+            sin = emb.sin()
+        return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
+    ################## end ## remove input_ids #################
 
 
 # Copied from transformers.models.llama.modeling_llama.rotate_half
@@ -161,8 +154,8 @@ def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
         `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
     """
     
-    cos = cos[None, None, :, :]
-    sin = sin[None, None, :, :]
+    cos = cos.unsqueeze(unsqueeze_dim)
+    sin = sin.unsqueeze(unsqueeze_dim)
 
     ################# begin # pe for query #################
     q_len = q.shape[2]    
@@ -261,12 +254,6 @@ class Qwen2Attention(nn.Module):
         use_cache: bool = False,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
         bsz, q_len, _ = hidden_states.size()
-        
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
 
         query_states = self.q_proj(hidden_states)
         key_states = self.k_proj(hidden_states)
@@ -278,16 +265,16 @@ class Qwen2Attention(nn.Module):
 
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
-        if self.config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
-        if self.config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
 
         # repeat k/v heads if n_kv_heads < n_heads
@@ -360,12 +347,6 @@ class Qwen2FlashAttention2(Qwen2Attention):
         use_cache: bool = False,
     ):
         
-        ################# begin # init compress #################
-        if past_key_value is not None and past_key_value.init_compress_check(self.layer_idx):
-            past_key_value.init_compress(self.q_proj.weight, self.k_proj.weight, self.v_proj.weight, 
-                                         layer_idx=self.layer_idx)
-        ################## end ## init compress #################
-
         bsz, q_len, _ = hidden_states.size()
 
         query_states = self.q_proj(hidden_states)
@@ -378,16 +359,16 @@ class Qwen2FlashAttention2(Qwen2Attention):
 
         ################# begin # pe after cache #################
         if past_key_value is not None:
-            key_states, value_states = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
+            key_states, value_states, position_ids_real, position_ids_for_pe = past_key_value.update(query_states, key_states, value_states, self.layer_idx)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_wo_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_wo_pe(query_states, key_states, position_ids_real, self.layer_idx)
 
-        cos, sin = self.rotary_emb(value_states)
+        cos, sin = self.rotary_emb(value_states, position_ids_for_pe)  # 
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
-        if self.config.long_cache_config.score_record and past_key_value._generate_tokens > 0:
-            past_key_value.update_score_w_pe(query_states, key_states, self.layer_idx)
+        if self.config.long_cache_config.score_record and q_len == 1:
+            past_key_value.update_score_w_pe(query_states, key_states, position_ids_real, self.layer_idx)
         ################## end ## pe after cache #################
 
         # repeat k/v heads if n_kv_heads < n_heads

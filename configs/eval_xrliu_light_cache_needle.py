@@ -45,8 +45,8 @@ infer = dict(
         max_num_workers=88, 
         task=dict(type=OpenICLInferTask), 
         aliyun_cfg=aliyun_cfg,
-        preemptible=False, 
-        priority=9, 
+        preemptible=False,  # True,  # 
+        priority=6, 
         retry=1),
 )
 

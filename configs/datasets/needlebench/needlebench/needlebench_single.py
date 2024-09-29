@@ -52,12 +52,13 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = [32000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 1250000, ]  #  1500000,48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
-# context_lengths = [800000, 1000000]
-depths_list = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
+# context_lengths = [700000, 800000, 900000, 1000000, ]  # 32000, 100000, 200000, 300000, 400000, 500000, 600000, 48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
+context_lengths = [1250000, 1500000, 1750000, 2000000, ]  # 1000000, 
+# depths_list = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
+depths_list = [1, 20, 40, 60, 80, 100, ]  # 10, 30, 50, 70, 90, 
 
 base_path = './data/needlebench_v2'
-file_list = ['en_un_asr.jsonl']  # PaulGrahamEssays 
+file_list = ['en_un_asr_xrliu.jsonl']  # PaulGrahamEssays 
 needlebench_en_datasets = []
 needle_file_name = 'needles_xrliu.jsonl'
 
@@ -72,7 +73,7 @@ for original_context_length in context_lengths:
             'depth': int(depth_percent),
             'tokenizer_model': 'gpt-4',
             'file_list': file_list,
-            'num_repeats_per_file': 10,
+            'num_repeats_per_file': 10,  # 9,  # 
             'length_buffer': 600,
             'guide': True,
             'language': 'English',

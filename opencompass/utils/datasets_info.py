@@ -269,7 +269,7 @@ DATASETS_MAPPING = {
     "opencompass/Longbench": {
         "ms_id": "",
         "hf_id": "THUDM/LongBench",
-        "local": "./data/Longbench",
+        "local": "./data/THUDM/Longbench",
     },
     # Needlebench
     "opencompass/needlebench": {

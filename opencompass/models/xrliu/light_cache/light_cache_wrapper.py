@@ -232,7 +232,7 @@ class LightCacheCausalLM(HuggingFaceCausalLM):
             # self.model.eval()
             
         elif model_type == 'qwen2':
-            from .cache_utils import LightCacheConfig
+            from .cache_utils_v0921 import LightCacheConfig
             from .light_cache_qwen2 import Qwen2ForCausalLM
             # assert type(self.long_cache_config) == dict, f"long_cache_config must be a dict, but got {type(self.long_cache_config)}"
             self.long_cache_config = LightCacheConfig(num_key_value_heads=self.config.num_key_value_heads, 
