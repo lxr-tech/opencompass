@@ -51,17 +51,21 @@ from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
 
-from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
-from .xrliu.huggingface_long import HuggingFaceModel
-from .xrliu.turbomind_long import TurboMindModelLong
-from .xrliu.turbomind_short import TurboMindModelShort
-from .xrliu.infllm_model import INFLLM_xrliu
+# note: 
+# 每个人自己提交的时候把自己的类都注释掉再提交，提交完后再解除注释使用
+# 使用过程中，如果使用别人已经实现的类，先复制到自己的路径下再修改使用
+
+# from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
+# from .xrliu.huggingface_long import HuggingFaceModel
+# from .xrliu.turbomind_long import TurboMindModelLong
+# from .xrliu.turbomind_short import TurboMindModelShort
+# from .xrliu.infllm_model import InfLLM_xrliu
 # from .xrliu.vllm_long import VLLMCausalLM
 
-from .zgliu.llama2_h2o import Llama2_H2O
-from .zgliu.llama2_snapkv import Llama2_SnapKV
-from .zgliu.llama2_streamingllm import Llama2_StreamingLLM
-from .zgliu.infllm_model import INFLLM_LlamaForCausalLM
-from .zgliu.kivi_model import KIVI_LlamaForCausalLM
-from .zgliu.lightcache_model import LightCache_MossHuaweiForCausalLM
-from .zgliu.rag_context_model import RAG_CONTEXT_LlamaForCausalLM
+# from .zgliu.llama2_h2o import Llama2_H2O
+# from .zgliu.llama2_snapkv import Llama2_SnapKV
+# from .zgliu.llama2_streamingllm import Llama2_StreamingLLM
+# from .zgliu.infllm_model import INFLLM_LlamaForCausalLM
+# from .zgliu.kivi_model import KIVI_LlamaForCausalLM
+# from .zgliu.lightcache_model import LightCache_MossHuaweiForCausalLM
+# from .zgliu.rag_context_model import RAG_CONTEXT_LlamaForCausalLM
