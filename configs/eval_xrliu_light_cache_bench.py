@@ -7,9 +7,9 @@ from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 with read_base():
     from .dataset_xrliu.long_score_long import datasets
     # from .model_xrliu.huggingface_32k import models
-    from .model_xrliu.light_cache_32k import models
+    # from .model_xrliu.light_cache_32k import models
     # from .model_xrliu.light_cache_128k import models
-    # from .model_xrliu.turbomind_128k import models
+    from .model_xrliu.vllm_128k import models
 
 work_dir = './outputs_xrliu/long_cache_bench/'
 
@@ -19,8 +19,8 @@ alillm2_data_sources = ("d-y3io773he2wcbc9pg9,d-gb3sr4nek0oo7g6t5o,d-3gpx15bjuem
 
 aliyun_cfg = dict(
     bashrc_path="/cpfs01/user/liuxiaoran/.bashrc",
-    conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1', 
-    # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-cuda12.1', 
+    # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1', 
+    conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.4', 
     ali_submit_dlc_path='/nas/shared/public/songdemin/code/opencompass/run_ali_task.py',
     dlc_config_path="/cpfs01/user/liuxiaoran/dlc.config",
     workspace_id=alillm2_workspace_id,
@@ -36,8 +36,9 @@ infer = dict(
         max_num_workers=128,
         task=dict(type=OpenICLInferTask),
         aliyun_cfg=aliyun_cfg, 
-        preemptible=True, 
-        priority=9, 
+        preemptible=False, 
+        priority=6, 
+        driver='535.54.03', 
         retry=4),
 )
 

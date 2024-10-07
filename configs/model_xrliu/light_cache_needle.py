@@ -109,7 +109,23 @@ tags = [
         #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
         #   'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
         #   'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
-        
+
+        # ('-32.4x32.4096.512-clip127-qk', 'llama3_1_8B_chat', 'llama+', '{prompt}', -1,  
+        #  {'global_size': 32, 'mid_size': 4, 'span_size': 32, 'local_size': 4096, 'chunk_size': 512, 
+        #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
+        #   'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
+        #   'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
+        # ('-32.4x32.4096.512-clip127-qk', 'internlm2.5_7B_chat', 'internlm2', '{prompt}', -1,  
+        #  {'global_size': 32, 'mid_size': 4, 'span_size': 32, 'local_size': 4096, 'chunk_size': 512, 
+        #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
+        #   'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
+        #   'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
+        # ('-32.4x32.4096.512-clip127-qk', 'qwen2_7B_chat', 'qwen2', '{prompt}', -1,  
+        #  {'global_size': 32, 'mid_size': 4, 'span_size': 32, 'local_size': 4096, 'chunk_size': 512, 
+        #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
+        #   'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
+        #   'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
+
         # ('-32.1x32.4096.512-clip127-qk', 'llama3_1_8B', 'llama+', '{prompt}', -1,  
         #  {'global_size': 32, 'mid_size': 1, 'span_size': 32, 'local_size': 4096, 'chunk_size': 512, 
         #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
@@ -140,8 +156,8 @@ tags = [
         #   'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
         #   'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
         #   'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
-        ('-32.1x32.8192.1024-clip127-qk', 'qwen2_1B', 'qwen2', '{prompt}', -1,  
-         {'global_size': 32, 'mid_size': 1, 'span_size': 32, 'local_size': 8192, 'chunk_size': 1024, 
+        ('-32.1x32.8192.2048-clip127-qk', 'qwen2_1B', 'qwen2', '{prompt}', -1,  
+         {'global_size': 32, 'mid_size': 1, 'span_size': 32, 'local_size': 8192, 'chunk_size': 2048, 
           'first_prefill': 8192, 'recall_type': 'qk', 'pe_original': False, 'q_cache_len': 0, 
           'rope_scaling': None, 'recall_option': 'default', 'unique_option': 'group_unique', 
           'key_compress_ratio': 1, 'value_compress_ratio': 1, 'recall_clip': 127, }),
@@ -771,7 +787,7 @@ for abbr, group, model_type, prompt_format, long_bench_cat, long_cache_config in
             long_bench_cat=long_bench_cat,
             prompt_format=prompt_format, 
             batch_padding=False, # if false, inference with for-loop without batch padding
-            run_cfg=dict(num_gpus=2,  # num_gpus[group.split('-')[0]], #  
+            run_cfg=dict(num_gpus=4,  # num_gpus[group.split('-')[0]], #  
                          num_procs=1,  # num_gpus[group.split('-')[0]]
                          ), 
             quanto_enable=abbr.__contains__('quanto'), 

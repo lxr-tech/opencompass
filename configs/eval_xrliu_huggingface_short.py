@@ -19,6 +19,7 @@ aliyun_cfg = dict(
     bashrc_path="/cpfs01/user/liuxiaoran/.bashrc",
     conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1', 
     # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-cuda12.1', 
+    ali_submit_dlc_path='/nas/shared/public/songdemin/code/opencompass/run_ali_task.py',
     dlc_config_path="/cpfs01/user/liuxiaoran/dlc.config",
     workspace_id=alillm2_workspace_id,
     worker_image='dsw-registry-vpc.cn-wulanchabu.cr.aliyuncs.com/pai/modelscope:1.16.1-pytorch2.3.0tensorflow2.16.1-gpu-py310-cu121-ubuntu22.04',
@@ -33,6 +34,7 @@ infer = dict(
         max_num_workers=128,
         task=dict(type=OpenICLInferTask),
         aliyun_cfg=aliyun_cfg, 
+        preemptible=True, 
         priority=6, 
         retry=4),
 )
@@ -44,12 +46,13 @@ eval = dict(
         max_num_workers=64,
         task=dict(type=OpenICLEvalTask),
         aliyun_cfg=aliyun_cfg,
+        preemptible=True, 
         priority=9, 
         retry=4),
 )
 
 # source /fs-computility/llm/liuxiaoran/.bashrc
 # conda activate /cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1
-# python run.py configs/eval_huggingface_short.py --dump-eval-details --debug -r 调试用
-# python run.py configs/eval_huggingface_short.py --dump-eval-details -r 第一次用
+# python run.py configs/eval_xrliu_huggingface_short.py --dump-eval-details --debug -r 调试用
+# python run.py configs/eval_xrliu_huggingface_short.py --dump-eval-details -r 第一次用
 #  . 第二次用

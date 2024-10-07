@@ -540,7 +540,7 @@ class DynamicCache(Cache):
 
         if 'pe' in self.cache_config.recall_type:
             self.rotary_emb = LlamaScalingNTKScalingRotaryEmbedding(
-                    self.cache_config.additional_params['dim'],  # 128,
+                    128,  # self.cache_config.additional_params['dim'],  # 
                     max_position_embeddings=self.cache_config.additional_params['max_position_embeddings'],  # 8192,
                     base=self.cache_config.additional_params['rope_theta'],  # 500000,
                 )
@@ -723,7 +723,7 @@ class DynamicCache(Cache):
                 cos, sin = self.rotary_emb(self.value_cache[layer_idx])  # , position_ids
                 recall_q, recall_k = apply_rotary_pos_emb(recall_q, recall_k, cos.to(query_states.device), sin.to(query_states.device))
 
-            if qlen != 1:
+            if qlen != 1 and self.cache_config.mid_size in [1, 4]:
                 indices = einsum_topk_func(recall_q, recall_k[..., global_size:-local_size, :], 
                                            min(self.cache_config.mid_size, mid_size))  # b, n, sq, k; 
             else:

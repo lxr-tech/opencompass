@@ -45,6 +45,7 @@ class DLCRunner(BaseRunner):
                  debug: bool = False, 
                  priority: int = 6, 
                  preemptible: bool = False,  # AcceptQuotaOversold, ForceQuotaOverSold, ForbiddenQuotaOverSold
+                 driver: str = None, 
                  lark_bot_url: str = None):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.aliyun_cfg = aliyun_cfg
@@ -52,6 +53,7 @@ class DLCRunner(BaseRunner):
         self.retry = retry
         self.preemptible = preemptible
         self.priority = priority
+        self.driver = driver  # '535.54.03', '470.199.02', None
 
         self.eval_with_gpu = eval_with_gpu
 
@@ -183,6 +185,7 @@ class DLCRunner(BaseRunner):
                         f" --worker_image {self.aliyun_cfg['worker_image']}"
                         f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                         f" --worker_shared_memory {max(num_gpus * 64, 48)}Gi"
+                        f"{(' --driver ' + self.driver) if self.driver is not None else ''}"
                         " --preemptible true"
                         f" --priority {self.priority}")
                 
@@ -199,6 +202,7 @@ class DLCRunner(BaseRunner):
                         f' --worker_gpu {num_gpus}'
                         f' --worker_memory {max(num_gpus * 64, 48)}Gi'
                         f" --worker_image {self.aliyun_cfg['worker_image']}"
+                        f"{(' --driver ' + self.driver) if self.driver is not None else ''}"
                         " --interactive"
                         f" --priority {self.priority}")
 

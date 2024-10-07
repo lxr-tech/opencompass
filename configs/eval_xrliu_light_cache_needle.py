@@ -47,7 +47,7 @@ infer = dict(
         aliyun_cfg=aliyun_cfg,
         preemptible=False,  # True,  # 
         priority=6, 
-        retry=1),
+        retry=2),
 )
 
 eval = dict(
@@ -57,7 +57,7 @@ eval = dict(
         max_num_workers=88,
         task=dict(type=OpenICLEvalTask),
         aliyun_cfg=aliyun_cfg,
-        preemptible=True, 
+        preemptible=False, 
         priority=9, 
         retry=2),
 )

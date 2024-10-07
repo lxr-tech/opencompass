@@ -70,8 +70,8 @@ infer = dict(
         max_num_workers=256,  # 84,
         task=dict(type=OpenICLInferTask),
         aliyun_cfg=aliyun_cfg, 
-        preemptible=True, 
-        priority=9, 
+        preemptible=False, 
+        priority=6, 
         retry=2),
 )
 
@@ -98,8 +98,8 @@ eval = dict(
 
 # source /fs-computility/llm/liuxiaoran/.bashrc
 # conda activate /cpfs01/user/liuxiaoran/miniconda3/envs/llm-cuda12.1
-# python run.py configs/eval_light_cache_ruler.py --dump-eval-details --debug -r  调试用
-# python run.py configs/eval_light_cache_ruler.py --dump-eval-details -r 20240820_190019 第一次用
+# python run.py configs/eval_xrliu_light_cache_ruler.py --dump-eval-details --debug -r  调试用
+# python run.py configs/eval_xrliu_light_cache_ruler.py --dump-eval-details -r 20240820_190019 第一次用
 #  . 第二次用
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

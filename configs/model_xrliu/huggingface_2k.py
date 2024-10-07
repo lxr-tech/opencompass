@@ -39,6 +39,10 @@ path_dict = {'llama2_7B': '',
              'moss2_13B_v1_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v1/2000/', 
              'moss2_13B_v2_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v2/1000/', 
              'moss2_13B_v2_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v2/4000/', 
+
+             'moss2_13B_v3_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/1000/', 
+             'moss2_13B_v3_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/2000/', 
+             'moss2_13B_v3_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/5000/', 
             }
 
 num_gpus = {'llama2_7B': 1, 'llama2_7B_chat': 1, 'llama2_13B': 2, 
@@ -51,6 +55,7 @@ num_gpus = {'llama2_7B': 1, 'llama2_7B_chat': 1, 'llama2_13B': 2,
             'mistral3_7B': 1, 'mistral3_7B_chat': 1, 
             'glm4_9B_chat_1M': 1, 
             'moss2_13B_v0': 2, 'moss2_13B_v1_1000': 2, 'moss2_13B_v1_2000': 2, 'moss2_13B_v2_1000': 2, 'moss2_13B_v2_4000': 2, 
+            'moss2_13B_v3_1000': 2, 'moss2_13B_v3_2000': 2, 'moss2_13B_v3_5000': 2, 
             }
 
 
@@ -59,11 +64,14 @@ tags = [
         # ('', 'llama3_1_8B', 'llama3_1_8B', {}), 
         # ('', 'qwen1_5_14B', 'qwen1_5_14B', {}), 
         # ('', 'internlm2.5_7B', 'internlm2.5_7B', {}), 
-        ('', 'internlm2.5_20B', 'internlm2.5_20B', {}), 
+        # ('', 'internlm2.5_20B', 'internlm2.5_20B', {}), 
         # ('', 'moss2_13B_v0', 'moss2_13B_v0', {}), 
         # ('', 'moss2_13B_v1_1000', 'moss2_13B_v1_1000', {}), 
         # ('', 'moss2_13B_v2_1000', 'moss2_13B_v2_1000', {}), 
         # ('', 'moss2_13B_v2_4000', 'moss2_13B_v2_4000', {}), 
+        ('', 'moss2_13B_v3_1000', 'moss2_13B_v3_1000', {}), 
+        ('', 'moss2_13B_v3_2000', 'moss2_13B_v3_2000', {}), 
+        ('', 'moss2_13B_v3_5000', 'moss2_13B_v3_5000', {}), 
         ]
 
 models = [

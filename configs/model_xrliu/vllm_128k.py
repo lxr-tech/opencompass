@@ -1,4 +1,4 @@
-from opencompass.models import TurboMindModelLong
+from opencompass.models.xrliu.vllm_long import VLLMCausalLM
 
 path_dict = {'llama2_7B': '', 
              'llama2_7B_chat': '', 
@@ -8,6 +8,7 @@ path_dict = {'llama2_7B': '',
              'llama3_1_8B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B/snapshots/48d6d0fc4e02fb1269b36940650a1b7233035cbb/', 
              'llama3_1_8B_chat': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B-Instruct/snapshots/07eb05b21d191a58c577b4a45982fe0c049d0693/', 
              'llama3_1_70B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-70B/snapshots/7740ff69081bd553f4879f71eebcc2d6df2fbcb3/', 
+             'llama3_2_3B_chat': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Llama-3.2-3B-Instruct/snapshots/392a143b624368100f77a3eafaa4a2468ba50a72/', 
              'internlm2_1B': '',
              'internlm2_1B_base': '',
              'internlm2_7B': '',
@@ -40,71 +41,37 @@ num_gpus = {'llama2_7B': 4, 'llama2_7B_chat': 4, 'llama2_13B': 8,
             }
 
 tags = [
-        # ('-full_attn-q_int8-32k_cat', 'internlm2_7B', 31500, 
-        #  dict(session_len=32000, max_batch_size=1, quant_policy=8)), 
-        # ('-full_attn-q_int8-32k_cat', 'internlm2_1B', 31500, 
-        #  dict(session_len=32000, max_batch_size=1, quant_policy=8)), 
-        # ('-full_attn-q_int8-32k_cat', 'qwen1.5_1B', 31500, 
-        #  dict(session_len=32000, max_batch_size=1, quant_policy=8)), 
-        # ('-full_attn-q_int8-32k_cat', 'qwen1.5_7B', 31500, 
-        #  dict(session_len=32000, max_batch_size=1, quant_policy=8)), 
+        ('-vllm-32k_cat', 'llama3_1_8B_chat', 31500, ), 
+        ('-vllm-64k_cat', 'llama3_1_8B_chat', 63500, ), 
+        ('-vllm-128k_cat', 'llama3_1_8B_chat', 127500, ), 
 
-        # ('', 'llama3_1_8B', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
-        # ('', 'internlm2.5_7B', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
-        # ('', 'internlm2.5_7B_chat', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
-        # ('', 'qwen2_7B', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
-        # ('', 'qwen2_1B', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
-        # ('', 'qwen2_1B_chat', -1, 
-        #  dict(session_len=400000, max_batch_size=1)), 
+        ('-vllm-32k_cat', 'llama3_2_3B_chat', 31500, ), 
+        ('-vllm-64k_cat', 'llama3_2_3B_chat', 63500, ), 
+        ('-vllm-128k_cat', 'llama3_2_3B_chat', 127500, ), 
 
-        # ('-8k_cat', 'llama3_8B_chat', 7500, 
-        #  dict(session_len=8000, max_batch_size=1)), 
-        # ('-128k_cat', 'llama3_1_8B_chat', 127500, 
-        #  dict(session_len=128000, max_batch_size=1)), 
-        # ('-128k_cat', 'internlm2.5_7B_chat', 127500, 
-        #  dict(session_len=128000, max_batch_size=1)), 
-        # ('-128k_cat', 'qwen2_1B_chat', 127500, 
-        #  dict(session_len=128000, max_batch_size=1)), 
-        # ('-128k_cat', 'qwen2_7B_chat', 127500, 
-        #  dict(session_len=128000, max_batch_size=1)), 
+        ('-vllm-32k_cat', 'qwen2_7B_chat', 31500, ), 
+        ('-vllm-64k_cat', 'qwen2_7B_chat', 63500, ), 
+        ('-vllm-128k_cat', 'qwen2_7B_chat', 127500, ), 
 
-        # ('-32k_cat', 'qwen2_7B_chat', 31500, 
-        #  dict(session_len=32000, max_batch_size=1)), 
-        # ('-64k_cat', 'qwen2_7B_chat', 63500, 
-        #  dict(session_len=64000, max_batch_size=1)), 
-        # ('-128k_cat', 'qwen2_7B_chat', 127500, 
-        #  dict(session_len=128000, max_batch_size=1)), 
-
-        # ('-32k_cat', 'internlm2.5_7B', 31500, 
-        #  dict(rope_scaling_factor=2.5, session_len=32000, max_batch_size=1)), 
-        # ('-64k_cat', 'internlm2.5_7B', 63500, 
-        #  dict(rope_scaling_factor=2.5, session_len=64000, max_batch_size=1)), 
-        # ('-128k_cat', 'internlm2.5_7B', 127500, 
-        #  dict(rope_scaling_factor=2.5, session_len=128000, max_batch_size=1)), 
-
-        # ('-32k_cat', 'mistral3_7B_chat', 31500, 
-        #  dict(session_len=32000, max_batch_size=1)), 
+        ('-vllm-32k_cat', 'internlm2.5_7B_chat', 31500, ), 
+        ('-vllm-64k_cat', 'internlm2.5_7B_chat', 63500, ), 
+        ('-vllm-128k_cat', 'internlm2.5_7B_chat', 127500, ), 
     ]
 
 models = []
 
-for abbr, group, cat_len, engine_config in tags:
+for abbr, group, cat_len in tags:
     models.append(
         dict(
-            type=TurboMindModelLong,
+            type=VLLMCausalLM,
             abbr=f'{group}{abbr}',
             path=path_dict[group],
-            engine_config=engine_config,
-            gen_config=dict(top_k=1, top_p=1, temperature=1.0, max_new_tokens=500),
             max_out_len=50,
-            max_seq_len=1048576,
+            max_seq_len=1048576, 
+            long_bench_cat=cat_len, 
             batch_size=1,
-            concurrency=1,
+            tokenizer_kwargs=dict(padding_side='left', truncation_side='left', 
+                                  use_fast=False, trust_remote_code=True), 
             run_cfg=dict(num_gpus=1,  # num_gpus[group.split('-')[0]], 
                          num_procs=1),
             end_str='<eoa>',
