@@ -1,0 +1,2 @@
+修改transformers/dynamic_module_utils.py中的resolve_trust_remote_code函数
+函数第一行添加trust_remote_code = True
