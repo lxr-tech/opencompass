@@ -26,9 +26,31 @@ datasets += ARC_e_datasets
 from opencompass.models import HuggingFaceCausalLM
 from opencompass.models.kivi_model import KIVI_LlamaForCausalLM
 models = [
+        # dict(
+        #     type=KIVI_LlamaForCausalLM,
+        #     path='/remote-home1/zgliu/models/llama2-7b',
+        #     model_kwargs=dict(device_map='auto', trust_remote_code=True, torch_dtype=torch.bfloat16),
+        #     tokenizer_path='/remote-home1/zgliu/models/llama2-7b',
+        #     tokenizer_kwargs=dict(padding_side='left', truncation_side='left', trust_remote_code=True),
+        #     max_seq_len=2048,
+        #     max_out_len=50,
+        #     run_cfg=dict(num_gpus=1, num_procs=1),
+        #     batch_size=64,
+        # ),
+        # dict(
+        #     type=HuggingFaceCausalLM,
+        #     path='/remote-home1/zgliu/models/llama2-7b',
+        #     model_kwargs=dict(device_map='auto', trust_remote_code=True, torch_dtype=torch.bfloat16),
+        #     tokenizer_path='/remote-home1/zgliu/models/llama2-7b',
+        #     tokenizer_kwargs=dict(padding_side='left', truncation_side='left', trust_remote_code=True),
+        #     max_seq_len=2048,
+        #     max_out_len=50,
+        #     run_cfg=dict(num_gpus=1, num_procs=1),
+        #     batch_size=64,
+        # ),
         dict(
             type=KIVI_LlamaForCausalLM,
-            path='/remote-home1/zgliu/models/llama2-7b',
+            path='/remote-home1/zgliu/models/llama3-8b',
             model_kwargs=dict(device_map='auto', trust_remote_code=True, torch_dtype=torch.bfloat16),
             tokenizer_path='/remote-home1/zgliu/models/llama2-7b',
             tokenizer_kwargs=dict(padding_side='left', truncation_side='left', trust_remote_code=True),
@@ -39,7 +61,7 @@ models = [
         ),
         dict(
             type=HuggingFaceCausalLM,
-            path='/remote-home1/zgliu/models/llama2-7b',
+            path='/remote-home1/zgliu/models/llama3-8b',
             model_kwargs=dict(device_map='auto', trust_remote_code=True, torch_dtype=torch.bfloat16),
             tokenizer_path='/remote-home1/zgliu/models/llama2-7b',
             tokenizer_kwargs=dict(padding_side='left', truncation_side='left', trust_remote_code=True),
