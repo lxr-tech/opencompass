@@ -69,3 +69,6 @@ from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
 # from .zgliu.kivi_model import KIVI_LlamaForCausalLM
 # from .zgliu.lightcache_model import LightCache_MossHuaweiForCausalLM
 # from .zgliu.rag_context_model import RAG_CONTEXT_LlamaForCausalLM
+from .zgliu.selfextend_model import SelfExtend_LlamaForCausalLM
+from .zgliu.llama2_chunkllama import ChunkLlama_LlamaForCausalLM
+from .zgliu.llama2_rerope import Rerope_LlamaForCausalLM
