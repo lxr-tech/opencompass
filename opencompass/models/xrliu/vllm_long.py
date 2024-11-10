@@ -100,9 +100,10 @@ class VLLMCausalLM(HuggingFaceCausalLM):
         # Create a sampling params object.
         self.sampling_params = SamplingParams(top_k=1)
         # Create an LLM.
-        self.llm = LLM(model=path, trust_remote_code=True, 
-                       gpu_memory_utilization=0.75, 
-                       max_model_len=(1 + self.long_bench_cat // 1000) * 1000)
+        self.llm = LLM(model=path, trust_remote_code=True)
+        #    gpu_memory_utilization=0.75, 
+        #    max_model_len=(1 + self.long_bench_cat // 1000) * 1000
+                       
 
     @torch.no_grad()
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]: 

@@ -39,7 +39,7 @@ needlebench_infer_cfg = dict(
         template=dict(
             round=[
                 dict(role='HUMAN', prompt='{prompt}'),
-                dict(role='BOT', prompt='{answer}\n'),
+                # dict(role='BOT', prompt='{answer}\n'),
             ]
         )
         ),
@@ -52,15 +52,15 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = [32000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, ]  # 48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
+context_lengths = [32000, 100000, 200000, ]  # 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 48000, 16000, 50000, 800000, 500000, 150000, 250000, 350000, 500000
 # context_lengths = [1000000, 1250000, 1500000, 1750000, 2000000, 2500000, 3000000, 3500000, 4000000, ]  # 1000000, 
-depths_list = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
+depths_list = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]  # 
 # depths_list = [1, 20, 40, 60, 80, 100, ]  # 10, 30, 50, 70, 90, 
 
-base_path = './data/needlebench_v2'
-file_list = ['en_un_asr_xrliu.jsonl']  # PaulGrahamEssays 
+base_path = './data/needlebench_v2'  # 
+file_list = ['en_un_asr_xrliu.jsonl']  # PaulGrahamEssays # 
 needlebench_en_datasets = []
-needle_file_name = 'needles_xrliu.jsonl'
+needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
     for depth_percent in depths_list:

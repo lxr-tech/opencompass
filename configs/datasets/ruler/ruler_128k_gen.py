@@ -9,7 +9,8 @@ with read_base():
     from .ruler_qa_gen import qa_datasets  # QA
 
 
-import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+import_datasets = sum((v for k, v in locals().items()
+                      if k.endswith('_datasets')), [])
 
 # Evaluation config
 NUM_SAMPLES = 100  # Change to the number of samples you need

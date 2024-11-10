@@ -115,11 +115,11 @@ class HuggingFaceModel(BaseModel):
         model_config.attn_implementation = "flash_attention_2"
         # model_config._attn_implementation = "flash_attention_2"
         try:
-            self.model = AutoModelForCausalLM.from_pretrained(model_path, config=model_config, **model_kwargs)
-                                                            #   torch_dtype=torch.float16, device_map="auto",  trust_remote_code=True)  # , local_files_only=True: PretrainedConfig
+            self.model = AutoModelForCausalLM.from_pretrained(model_path, config=model_config,  # **model_kwargs)
+                                                              torch_dtype=torch.float16, device_map="auto",  trust_remote_code=True)  # , local_files_only=True: PretrainedConfig
         except ValueError:
-            self.model = AutoModel.from_pretrained(model_path, config=model_config, **model_kwargs)
-                                                #    torch_dtype=torch.float16, device_map="auto",  trust_remote_code=True)
+            self.model = AutoModel.from_pretrained(model_path, config=model_config,  # **model_kwargs)
+                                                   torch_dtype=torch.float16, device_map="auto",  trust_remote_code=True)
                                                       
         self.model.eval()
 

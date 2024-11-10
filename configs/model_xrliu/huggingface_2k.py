@@ -1,5 +1,5 @@
 
-from opencompass.models import HuggingFaceBaseModel
+from opencompass.models import HuggingFaceModel
 
 import torch
 import numpy as np
@@ -12,6 +12,7 @@ path_dict = {'llama2_7B': '',
              'llama3_1_8B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B/snapshots/48d6d0fc4e02fb1269b36940650a1b7233035cbb/', 
              'llama3_1_8B_chat': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B-Instruct/snapshots/07eb05b21d191a58c577b4a45982fe0c049d0693/', 
              'llama3_1_70B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-70B/snapshots/7740ff69081bd553f4879f71eebcc2d6df2fbcb3/', 
+             'llama3_2_3B':'/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Llama-3.2-3B/snapshots/5cc0ffe09ee49f7be6ca7c794ee6bd7245e84e60/', 
              'internlm2_1B': '',
              'internlm2_1B_base': '',
              'internlm2_7B': '',
@@ -43,10 +44,34 @@ path_dict = {'llama2_7B': '',
              'moss2_13B_v3_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/1000/', 
              'moss2_13B_v3_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/2000/', 
              'moss2_13B_v3_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v3/5000/', 
+
+             'llama3_2_3B-xpqiu_241013_200': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xpqiu-llama3_2_3B-241013/200/', 
+             'llama3_2_3B-xpqiu_241013_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xpqiu-llama3_2_3B-241013/1000/', 
+
+             'llama3_2_3B-xiaopiqiu_241017_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/1000/', 
+             'llama3_2_3B-xiaopiqiu_241017_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/2000/', 
+             'llama3_2_3B-xiaopiqiu_241017_3000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/3000/', 
+             'llama3_2_3B-xiaopiqiu_241017_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/4000/', 
+
+             'llama3_2_3B-xiaopiqiu_241018_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/1000/', 
+             'llama3_2_3B-xiaopiqiu_241018_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/2000/', 
+             'llama3_2_3B-xiaopiqiu_241018_3000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/3000/', 
+             'llama3_2_3B-xiaopiqiu_241018_12800': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/12800/', 
+
+             'llama3_2_3B-xiaopiqiu_241018-enhance_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018-enhance/1000/', 
+             'llama3_2_3B-xiaopiqiu_241018-enhance_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018-enhance/5000/', 
+
+             'llama3_2_3B-xiaopiqiu_241022_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/1000/', 
+             'llama3_2_3B-xiaopiqiu_241022_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/2000/', 
+             'llama3_2_3B-xiaopiqiu_241022_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/4000/', 
+             'llama3_2_3B-xiaopiqiu_241022_6000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/6000/', 
+             'llama3_2_3B-xiaopiqiu_241022_8000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/8000/', 
+
+             'llama3_2_3B-xiaopiqiu_241022-enhance_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022-enhance/5000/', 
             }
 
 num_gpus = {'llama2_7B': 1, 'llama2_7B_chat': 1, 'llama2_13B': 2, 
-            'llama3_8B': 1, 'llama3_8B_chat': 1, 'llama3_1_8B': 1, 'llama3_1_8B_chat': 1, 'llama3_1_70B': 4, 
+            'llama3_8B': 1, 'llama3_8B_chat': 1, 'llama3_1_8B': 1, 'llama3_1_8B_chat': 1, 'llama3_1_70B': 4, 'llama3_2_3B': 1, 
             'qwen1_5_14B': 2, 
             'qwen2_1B': 1, 'qwen2_1B_chat': 1, 'qwen2_7B': 1, 'qwen2_7B_chat': 1, 'qwen2_72B': 4, 
             'internlm2_7B': 1, 'internlm2_7B_chat': 1, 
@@ -69,16 +94,39 @@ tags = [
         # ('', 'moss2_13B_v1_1000', 'moss2_13B_v1_1000', {}), 
         # ('', 'moss2_13B_v2_1000', 'moss2_13B_v2_1000', {}), 
         # ('', 'moss2_13B_v2_4000', 'moss2_13B_v2_4000', {}), 
-        ('', 'moss2_13B_v3_1000', 'moss2_13B_v3_1000', {}), 
-        ('', 'moss2_13B_v3_2000', 'moss2_13B_v3_2000', {}), 
-        ('', 'moss2_13B_v3_5000', 'moss2_13B_v3_5000', {}), 
+        # ('', 'moss2_13B_v3_1000', 'moss2_13B_v3_1000', {}), 
+        # ('', 'moss2_13B_v3_2000', 'moss2_13B_v3_2000', {}), 
+        # ('', 'moss2_13B_v3_5000', 'moss2_13B_v3_5000', {}), 
+
+        ('', 'llama3_2_3B', 'llama3_2_3B', {}), 
+        # ('', 'llama3_2_3B-xpqiu_241013_200', 'llama3_2_3B-xpqiu_241013_200', {}), 
+        # ('', 'llama3_2_3B-xpqiu_241013_1000', 'llama3_2_3B-xpqiu_241013_1000', {}), 
+
+        # ('', 'llama3_2_3B-xiaopiqiu_241017_1000', 'llama3_2_3B-xiaopiqiu_241017_1000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241017_2000', 'llama3_2_3B-xiaopiqiu_241017_2000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241017_3000', 'llama3_2_3B-xiaopiqiu_241017_3000', {}), 
+
+        # ('', 'llama3_2_3B-xiaopiqiu_241018_1000', 'llama3_2_3B-xiaopiqiu_241018_1000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241018_2000', 'llama3_2_3B-xiaopiqiu_241018_2000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241018_3000', 'llama3_2_3B-xiaopiqiu_241018_3000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241018_12800', 'llama3_2_3B-xiaopiqiu_241018_12800', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241018-enhance_1000', 'llama3_2_3B-xiaopiqiu_241018-enhance_1000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241018-enhance_5000', 'llama3_2_3B-xiaopiqiu_241018-enhance_5000', {}), 
+
+        # ('', 'llama3_2_3B-xiaopiqiu_241022_1000', 'llama3_2_3B-xiaopiqiu_241022_1000', {}), 
+        ('', 'llama3_2_3B-xiaopiqiu_241022_2000', 'llama3_2_3B-xiaopiqiu_241022_2000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241022_4000', 'llama3_2_3B-xiaopiqiu_241022_4000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241022_6000', 'llama3_2_3B-xiaopiqiu_241022_6000', {}), 
+        # ('', 'llama3_2_3B-xiaopiqiu_241022_8000', 'llama3_2_3B-xiaopiqiu_241022_8000', {}), 
+        ('', 'llama3_2_3B-xiaopiqiu_241022-enhance_5000', 'llama3_2_3B-xiaopiqiu_241022-enhance_5000', {}), 
         ]
 
 models = [
     dict(
-        type=HuggingFaceBaseModel,
+        type=HuggingFaceModel,
         abbr=f'{group}{abbr}',
-        path=path_dict[path], 
+        model_path=path_dict[path], 
+        config_path=path_dict[group.split('-')[0]],
         model_kwargs=dict(torch_dtype='float16', device_map='auto', 
                           trust_remote_code=True, attn_implementation='flash_attention_2', **model_kwargs), 
         tokenizer_kwargs=dict(padding_side='left', truncation_side='left',

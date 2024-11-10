@@ -10,8 +10,8 @@ with read_base():
     from .datasets.ruler.ruler_combined_gen import ruler_combined_datasets
     from ..configs.summarizers.groups.ruler import ruler_summary_groups
 
-    from .model_xrliu.light_cache_needle import models
-    # from .model_xrliu.turbomind_needle import models
+    # from .model_xrliu.light_cache_needle import models
+    from .model_xrliu.turbomind_needle import models
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
@@ -70,7 +70,7 @@ infer = dict(
         max_num_workers=256,  # 84,
         task=dict(type=OpenICLInferTask),
         aliyun_cfg=aliyun_cfg, 
-        preemptible=False, 
+        preemptible=True, 
         priority=6, 
         retry=2),
 )

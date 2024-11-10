@@ -12,6 +12,7 @@ path_dict = {'llama2_7B': '',
              'llama3_1_8B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B/snapshots/48d6d0fc4e02fb1269b36940650a1b7233035cbb/', 
              'llama3_1_8B_chat': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-8B-Instruct/snapshots/07eb05b21d191a58c577b4a45982fe0c049d0693/', 
              'llama3_1_70B': '/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Meta-Llama-3.1-70B/snapshots/7740ff69081bd553f4879f71eebcc2d6df2fbcb3/', 
+             'llama3_2_3B':'/nas/shared/public/llmeval/model_weights/hf_hub/models--meta-llama--Llama-3.2-3B/snapshots/5cc0ffe09ee49f7be6ca7c794ee6bd7245e84e60/', 
              'internlm2_1B': '',
              'internlm2_1B_base': '',
              'internlm2_7B': '',
@@ -35,10 +36,40 @@ path_dict = {'llama2_7B': '',
 
              'moss2_13B_v2_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v2/1000/', 
              'moss2_13B_v2_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/moss2-13b-v2/4000/', 
+
+             'yxg_24101101a': '/cpfs01/shared/alillm2/user/yangxiaogui/ckpts/enhance/baseline/1/main/5000_hf/',
+
+             'llama3_2_3B-xpqiu_241013_200': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xpqiu-llama3_2_3B-241013/200/', 
+             'llama3_2_3B-xpqiu_241013_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xpqiu-llama3_2_3B-241013/1000/', 
+
+             'llama3_2_3B-xiaopiqiu_241017_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/1000/', 
+             'llama3_2_3B-xiaopiqiu_241017_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/2000/', 
+             'llama3_2_3B-xiaopiqiu_241017_3000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/3000/', 
+             'llama3_2_3B-xiaopiqiu_241017_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241017/4000/', 
+
+             'llama3_2_3B-xiaopiqiu_241018_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/1000/', 
+             'llama3_2_3B-xiaopiqiu_241018_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/2000/', 
+             'llama3_2_3B-xiaopiqiu_241018_3000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/3000/', 
+             'llama3_2_3B-xiaopiqiu_241018_12800': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018/12800/', 
+
+             'llama3_2_3B-xiaopiqiu_241018-enhance_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018-enhance/1000/', 
+             'llama3_2_3B-xiaopiqiu_241018-enhance_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241018-enhance/5000/', 
+
+             'llama3_2_3B-xiaopiqiu_241022_1000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/1000/', 
+             'llama3_2_3B-xiaopiqiu_241022_2000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/2000/', 
+             'llama3_2_3B-xiaopiqiu_241022_4000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/4000/', 
+             'llama3_2_3B-xiaopiqiu_241022_6000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/6000/', 
+             'llama3_2_3B-xiaopiqiu_241022_8000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022/8000/', 
+
+             'llama3_2_3B-xiaopiqiu_241022-enhance_5000': '/nas/shared/public/liuxiaoran/tmp_ckpts_hf/xiaopiqiu-llama3_2_3B-241022-enhance/5000/', 
+
+             'Ampere2_5_7B_base': '/cpfs02/puyu/shared/alillm2/alillm2/songdemin/ckpts/official_Ampere2_5_7B_3_0_0_256K_hf', 
+             'Ampere2_5_7B_enhance': '/cpfs02/puyu/shared/alillm2/alillm2/songdemin/ckpts/official_Ampere2_5_7B_Enhance_256k_0_0_0_FixBBHLeak_wsd_from_50000_to_52500_hf', 
             }
 
 num_gpus = {'llama2_7B': 1, 'llama2_7B_chat': 1, 'llama2_13B': 2, 
             'llama3_8B': 1, 'llama3_8B_chat': 1, 'llama3_1_8B': 1, 'llama3_1_8B_chat': 1, 'llama3_1_70B': 4, 
+            'llama3_2_3B': 1,  
             'qwen1_5_14B': 8, 'qwen1_5_32B': 8, 
             'qwen2_1B': 1, 'qwen2_1B_chat': 1, 'qwen2_7B': 1, 'qwen2_7B_chat': 1, 'qwen2_72B': 4, 
             'internlm2_7B': 1, 'internlm2_7B_chat': 1, 
@@ -48,6 +79,8 @@ num_gpus = {'llama2_7B': 1, 'llama2_7B_chat': 1, 'llama2_13B': 2,
             'glm4_9B_chat_1M': 1, 
 
             'moss2_13B_v2_1000': 2, 'moss2_13B_v2_4000': 2, 
+
+            'yxg_24101101a': 1, 'Ampere2_5_7B_base': 1, 'Ampere2_5_7B_enhance': 1, 
             }
 
 
@@ -63,18 +96,67 @@ tags = [
 
         # ('-32k_cat', 'moss2_13B_v2_1000', 'moss2_13B_v2_1000', '{prompt}', 31500, 
         # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
-        ('-32k_cat', 'moss2_13B_v2_4000', 'moss2_13B_v2_4000', '{prompt}', 31500, 
-        {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'moss2_13B_v2_4000', 'moss2_13B_v2_4000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
 
-        ('-32k_cat', 'qwen1_5_14B', 'qwen1_5_14B', '{prompt}', 31500, 
+        # ('-32k_cat', 'qwen1_5_14B', 'qwen1_5_14B', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'qwen1_5_32B', 'qwen1_5_32B', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'internlm2_20B', 'internlm2_20B', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'internlm2.5_20B', 'internlm2.5_20B', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-4k_cat', 'llama2_13B', 'llama2_13B', '{prompt}', 3500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B', 'llama3_2_3B', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xpqiu_241013_200', 'llama3_2_3B-xpqiu_241013_200', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xpqiu_241013_1000', 'llama3_2_3B-xpqiu_241013_1000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241017_1000', 'llama3_2_3B-xiaopiqiu_241017_1000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241017_2000', 'llama3_2_3B-xiaopiqiu_241017_2000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241017_3000', 'llama3_2_3B-xiaopiqiu_241017_3000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241017_4000', 'llama3_2_3B-xiaopiqiu_241017_4000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018_1000', 'llama3_2_3B-xiaopiqiu_241018_1000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018_2000', 'llama3_2_3B-xiaopiqiu_241018_2000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018_3000', 'llama3_2_3B-xiaopiqiu_241018_3000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018_12800', 'llama3_2_3B-xiaopiqiu_241018_12800', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018-enhance_1000', 'llama3_2_3B-xiaopiqiu_241018-enhance_1000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241018-enhance_5000', 'llama3_2_3B-xiaopiqiu_241018-enhance_5000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022_1000', 'llama3_2_3B-xiaopiqiu_241022_1000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022_2000', 'llama3_2_3B-xiaopiqiu_241022_2000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022_4000', 'llama3_2_3B-xiaopiqiu_241022_4000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022_6000', 'llama3_2_3B-xiaopiqiu_241022_6000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022_8000', 'llama3_2_3B-xiaopiqiu_241022_8000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        # ('-32k_cat', 'llama3_2_3B-xiaopiqiu_241022-enhance_5000', 'llama3_2_3B-xiaopiqiu_241022-enhance_5000', '{prompt}', 31500, 
+        # {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
+
+        ('-32k_cat', 'Ampere2_5_7B_base', 'Ampere2_5_7B_base', '{prompt}', 31500, 
         {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
-        ('-32k_cat', 'qwen1_5_32B', 'qwen1_5_32B', '{prompt}', 31500, 
-        {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
-        ('-32k_cat', 'internlm2_20B', 'internlm2_20B', '{prompt}', 31500, 
-        {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
-        ('-32k_cat', 'internlm2.5_20B', 'internlm2.5_20B', '{prompt}', 31500, 
-        {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
-        ('-4k_cat', 'llama2_13B', 'llama2_13B', '{prompt}', 3500, 
+        ('-32k_cat', 'Ampere2_5_7B_enhance', 'Ampere2_5_7B_enhance', '{prompt}', 31500, 
         {'torch_dtype': 'float16', 'device_map': 'auto',  'trust_remote_code': True}), 
         ]
 
