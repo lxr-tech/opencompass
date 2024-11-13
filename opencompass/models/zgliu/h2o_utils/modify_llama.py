@@ -25,6 +25,7 @@ logger = logging.get_logger(__name__)
 
 from .kv_clusters import SnapKVCluster, H2OCluster, SinkCluster
 
+from transformers.modeling_flash_attention_utils import _flash_attention_forward
 
 # snapKV
 def llama_flash_attn2_forward(
@@ -162,8 +163,9 @@ def llama_flash_attn2_forward(
         key_states = key_states.to(target_dtype)
         value_states = value_states.to(target_dtype)
 
-    attn_output = self._flash_attention_forward(
-        query_states, key_states, value_states, attention_mask, q_len, dropout=dropout_rate
+    attn_output = _flash_attention_forward(
+        query_states, key_states, value_states, attention_mask, q_len, dropout=dropout_rate,
+        is_causal=self.is_causal, 
     )
 
     attn_output = attn_output.reshape(bsz, q_len, self.hidden_size).contiguous()

@@ -1,5 +1,5 @@
 from typing import Optional
-from .huggingface import HuggingFaceCausalLM
+from opencompass.models import HuggingFaceCausalLM
 from opencompass.registry import MODELS
 import copy
 
@@ -35,7 +35,6 @@ class Llama2_H2O(HuggingFaceCausalLM):
             torch_dtype=torch.bfloat16,
             attn_implementation="flash_attention_2",
         )
-        model.eval()
         return model
     
     def _load_model(self,
@@ -49,5 +48,6 @@ class Llama2_H2O(HuggingFaceCausalLM):
         from .h2o_utils.modify_llama import hijack_llama
         hijack_llama()
         self.model = self.load_model(path, "h2o")
-
+        self.model.eval()
+        self.model.generation_config.do_sample = False
         self.logger.info("Model loaded and converted with H2O method")

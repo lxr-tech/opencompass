@@ -14,6 +14,7 @@ with read_base():
     from opencompass.configs.datasets.ruler.ruler_32k_gen import niah_datasets
 
 datasets = []
+datasets += niah_datasets
 datasets += ARC_e_datasets
 datasets += ARC_c_datasets
 
