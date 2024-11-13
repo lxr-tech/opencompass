@@ -15,8 +15,7 @@ with read_base():
 
 datasets = []
 # datasets += ARC_e_datasets
-# datasets += ARC_c_datasets
-datasets += ruler_datasets
+datasets += ARC_c_datasets
 
 from opencompass.models import HuggingFaceModelForLong
 from opencompass.models import Rerope_LlamaForCausalLM

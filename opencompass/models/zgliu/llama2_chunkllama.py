@@ -15,17 +15,16 @@ PromptType = Union[PromptList, str]
 
 # from .huggingface import HuggingFaceCausalLM
 from opencompass.models.huggingface import HuggingFaceCausalLM
-from transformers import LlamaForCausalLM
+from transformers import LlamaForCausalLM, LlamaConfig
 from .chunkllama_utils import replace_with_chunkllama
 
 @MODELS.register_module()
 class ChunkLlama_LlamaForCausalLM(HuggingFaceCausalLM):
     def __init__(self, **kwargs):
         cl_kwargs: Dict = kwargs.pop('chunkllama_kwargs', None)
+        self.pretraining_length = None
         if cl_kwargs is not None:
-            self.pretraining_length = cl_kwargs.get('pretraining_length', 4096)
-        else:
-            self.pretraining_length = 4096
+            self.pretraining_length = cl_kwargs.get('pretraining_length', None)
         super().__init__(**kwargs)
 
     def _load_model(self,
@@ -35,6 +34,11 @@ class ChunkLlama_LlamaForCausalLM(HuggingFaceCausalLM):
         # from transformers import AutoModelForCausalLM
 
         self._set_model_kwargs_torch_dtype(model_kwargs)
+        if self.pretraining_length is None:
+            config: LlamaConfig = LlamaConfig.from_pretrained(path)
+            self.pretraining_length = config.max_position_embeddings 
+            if config.rope_scaling is not None:
+                self.pretraining_length = config.rope_scaling.get("original_max_position_embeddings", self.pretraining_length)
 
         replace_with_chunkllama(self.pretraining_length)
         self.model = LlamaForCausalLM.from_pretrained(path, **model_kwargs)

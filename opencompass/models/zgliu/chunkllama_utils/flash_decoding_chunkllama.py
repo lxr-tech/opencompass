@@ -7,6 +7,7 @@ import math
 from transformers.modeling_attn_mask_utils import _prepare_4d_causal_attention_mask, _prepare_4d_causal_attention_mask_for_sdpa
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.models.llama.modeling_llama import rotate_half, repeat_kv, LLAMA_INPUTS_DOCSTRING
+from transformers.models.llama.configuration_llama import LlamaConfig
 import torch
 import transformers
 from transformers.utils import add_start_docstrings_to_model_forward
@@ -169,14 +170,23 @@ def get_mscale(scale=1):
 
 
 class ChunkLlamaRotaryEmbedding(nn.Module):
-    def __init__(self, dim, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None, config=None):
+    def __init__(self, dim=None, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None, config: Optional[LlamaConfig]=None):
         super().__init__()
 
-        self.max_seq_len = max_position_embeddings
-        self.dim = dim
-        self.scaling_factor = scaling_factor
-        self.max_position_embeddings = max_position_embeddings
-        self.base = base
+        if config is None:
+            self.max_seq_len = max_position_embeddings
+            self.dim = dim
+            self.scaling_factor = scaling_factor
+            self.max_position_embeddings = max_position_embeddings
+            self.base = base
+        else:
+            self.max_seq_len = config.max_position_embeddings
+            partial_rotary_factor = config.partial_rotary_factor if hasattr(config, "partial_rotary_factor") else 1.0
+            head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+            self.dim = int(head_dim * partial_rotary_factor)
+            self.scaling_factor = scaling_factor if config.rope_scaling is None else config.rope_scaling["factor"]
+            self.max_position_embeddings = config.max_position_embeddings
+            self.base = config.rope_theta
 
         # Build here to make `torch.jit.trace` work.
         self._set_cos_sin_cache(
@@ -501,10 +511,10 @@ def LlamaModel_forward(
     if inputs_embeds is None:
         inputs_embeds = self.embed_tokens(input_ids)
 
-    if self._use_flash_attention_2:
+    if self.config._attn_implementation == "flash_attention_2":
         # 2d mask is passed through the layers
         attention_mask = attention_mask if (attention_mask is not None and 0 in attention_mask) else None
-    elif self._use_sdpa and not output_attentions:
+    elif self.config._attn_implementation == "sdpa" and not output_attentions:
         # output_attentions=True can not be supported when using SDPA, and we fall back on
         # the manual implementation that requires a 4D causal mask in all cases.
         attention_mask = _prepare_4d_causal_attention_mask_for_sdpa(
@@ -609,7 +619,6 @@ def causal_forward(self,
     >>> tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
     "Hey, are you conscious? Can you talk to me?\nI'm not conscious, but I can talk to you."
     ```"""
-    raise NotImplementedError("Not implemented yet. file is /remote-home1/rxli/opencompass/opencompass/models/zgliu/chunkllama_utils/flash_decoding_chunkllama.py")
     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
     output_hidden_states = (
         output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -713,6 +722,7 @@ def replace_with_chunkllama(pretraining_length=4096, local_window_size=None, max
     transformers.models.llama.modeling_llama.LlamaFlashAttention2.forward = forward
     transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = ChunkLlamaRotaryEmbedding
     transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = ChunkLlamaRotaryEmbedding
+
 # def replace_with_chunkllama(model, pretraining_length=4096, local_window_size=None, max_prompt_length=None):
 #     global chunk_size
 #     global local_window
