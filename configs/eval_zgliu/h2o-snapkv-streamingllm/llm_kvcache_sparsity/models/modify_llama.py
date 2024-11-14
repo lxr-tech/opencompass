@@ -41,9 +41,9 @@ def llama_flash_attn2_forward(
     # [SnapKV] init cluster
     if not hasattr(self, "kv_cluster"):
         if not hasattr(self.config, 'window_size'):
-            self.config.window_size = 32
+            self.config.window_size = 32 if getattr(self.config, "use_h2o", None) else 64
         if not hasattr(self.config, 'max_capacity_prompt'):
-            self.config.max_capacity_prompt = 2048
+            self.config.max_capacity_prompt = 4096
         if not hasattr(self.config, 'kernel_size'):
             self.config.kernel_size = 7
         if not hasattr(self.config, 'pooling'):

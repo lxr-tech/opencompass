@@ -11,8 +11,6 @@ import torch.nn.functional as F
 import transformers
 from transformers.cache_utils import Cache, DynamicCache
 from transformers.models.llama.modeling_llama import (
-    LlamaConfig,
-    LlamaAttention,
     LlamaFlashAttention2,
     LlamaForCausalLM,
     rotate_half,
@@ -41,9 +39,9 @@ def llama_flash_attn2_forward(
     # [SnapKV] init cluster
     if not hasattr(self, "kv_cluster"):
         if not hasattr(self.config, 'window_size'):
-            self.config.window_size = 4
+            self.config.window_size = 32
         if not hasattr(self.config, 'max_capacity_prompt'):
-            self.config.max_capacity_prompt = 8
+            self.config.max_capacity_prompt = 2048
         if not hasattr(self.config, 'kernel_size'):
             self.config.kernel_size = 7
         if not hasattr(self.config, 'pooling'):
@@ -230,6 +228,7 @@ def prepare_inputs_for_generation_llama(
     model_inputs.update(
         {
             "position_ids": position_ids,
+            "cache_position": None,
             "past_key_values": past_key_values,
             "use_cache": kwargs.get("use_cache"),
             "attention_mask": attention_mask,
