@@ -29,6 +29,8 @@ class SelfExtend_LlamaForCausalLM(HuggingFaceCausalLM):
         # lenght is within the maximum extended window size (For llama-2, it would be 
         # (4096 - neighbor_window) * group_size + neighbor_window ).
         se_dataparam: Dict = kwargs.pop('selfextend_kwargs', None)
+        self.selfextend_group_size = 64
+        self.selfextend_window_size = 1024
         if se_dataparam is not None:
             self.selfextend_group_size = se_dataparam.get('group_size', 64)
             self.selfextend_window_size = se_dataparam.get('window_size', 1024)

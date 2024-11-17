@@ -7,6 +7,7 @@ import math
 from transformers.modeling_attn_mask_utils import _prepare_4d_causal_attention_mask, _prepare_4d_causal_attention_mask_for_sdpa
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.models.llama.modeling_llama import rotate_half, repeat_kv, LLAMA_INPUTS_DOCSTRING
+from transformers.models.llama.configuration_llama import LlamaConfig
 import torch
 import transformers
 from transformers.utils import add_start_docstrings_to_model_forward
@@ -43,87 +44,6 @@ def new_flash_attn_with_kvcache(
     alibi_slopes=None,
     num_splits=0,
 ):
-    """
-    If k and v are not None, k_cache and v_cache will be updated *inplace* with the new values from
-    k and v. This is useful for incremental decoding: you can pass in the cached keys/values from
-    the previous step, and update them with the new keys/values from the current step, and do
-    attention with the updated cache, all in 1 kernel.
-
-    If you pass in k / v, you must make sure that the cache is large enough to hold the new values.
-    For example, the KV cache could be pre-allocated with the max sequence length, and you can use
-    cache_seqlens to keep track of the current sequence lengths of each sequence in the batch.
-
-    Also apply rotary embedding if rotary_cos and rotary_sin are passed in. The key @k will be
-    rotated by rotary_cos and rotary_sin at indices cache_seqlens, cache_seqlens + 1, etc.
-    If causal or local (i.e., window_size != (-1, -1)), the query @q will be rotated by rotary_cos
-    and rotary_sin at indices cache_seqlens, cache_seqlens + 1, etc.
-    If not causal and not local, the query @q will be rotated by rotary_cos and rotary_sin at
-    indices cache_seqlens only (i.e. we consider all tokens in @q to be at position cache_seqlens).
-
-    See tests/test_flash_attn.py::test_flash_attn_kvcache for examples of how to use this function.
-
-    Supports multi-query and grouped-query attention (MQA/GQA) by passing in KV with fewer heads
-    than Q. Note that the number of heads in Q must be divisible by the number of heads in KV.
-    For example, if Q has 6 heads and K, V have 2 heads, head 0, 1, 2 of Q will attention to head
-    0 of K, V, and head 3, 4, 5 of Q will attention to head 1 of K, V.
-
-    If causal=True, the causal mask is aligned to the bottom right corner of the attention matrix.
-    For example, if seqlen_q = 2 and seqlen_k = 5, the causal mask (1 = keep, 0 = masked out) is:
-        1 1 1 1 0
-        1 1 1 1 1
-    If seqlen_q = 5 and seqlen_k = 2, the causal mask is:
-        0 0
-        0 0
-        0 0
-        1 0
-        1 1
-    If the row of the mask is all zero, the output will be zero.
-
-    If window_size != (-1, -1), implements sliding window local attention. Query at position i
-    will only attend to keys between
-    [i + seqlen_k - seqlen_q - window_size[0], i + seqlen_k - seqlen_q + window_size[1]] inclusive.
-
-    Note: Does not support backward pass.
-
-    Arguments:
-        q: (batch_size, seqlen, nheads, headdim)
-        k_cache: (batch_size_cache, seqlen_cache, nheads_k, headdim) if there's no block_table,
-            or (num_blocks, page_block_size, nheads_k, headdim) if there's a block_table (i.e. paged KV cache)
-            page_block_size must be a multiple of 256.
-        v_cache: (batch_size_cache, seqlen_cache, nheads_k, headdim) if there's no block_table,
-            or (num_blocks, page_block_size, nheads_k, headdim) if there's a block_table (i.e. paged KV cache)
-        k [optional]: (batch_size, seqlen_new, nheads_k, headdim). If not None, we concatenate
-            k with k_cache, starting at the indices specified by cache_seqlens.
-        v [optional]: (batch_size, seqlen_new, nheads_k, headdim). Similar to k.
-        rotary_cos [optional]: (seqlen_ro, rotary_dim / 2). If not None, we apply rotary embedding
-            to k and q. Only applicable if k and v are passed in. rotary_dim must be divisible by 16.
-        rotary_sin [optional]: (seqlen_ro, rotary_dim / 2). Similar to rotary_cos.
-        cache_seqlens: int, or (batch_size,), dtype torch.int32. The sequence lengths of the
-            KV cache.
-        block_table [optional]: (batch_size, max_num_blocks_per_seq), dtype torch.int32.
-        cache_batch_idx: (batch_size,), dtype torch.int32. The indices used to index into the KV cache.
-            If None, we assume that the batch indices are [0, 1, 2, ..., batch_size - 1].
-            If the indices are not distinct, and k and v are provided, the values updated in the cache
-                 might come from any of the duplicate indices.
-        softmax_scale: float. The scaling of QK^T before applying softmax.
-            Default to 1 / sqrt(headdim).
-        causal: bool. Whether to apply causal attention mask (e.g., for auto-regressive modeling).
-        window_size: (left, right). If not (-1, -1), implements sliding window local attention.
-        rotary_interleaved: bool. Only applicable if rotary_cos and rotary_sin are passed in.
-            If True, rotary embedding will combine dimensions 0 & 1, 2 & 3, etc. If False,
-            rotary embedding will combine dimensions 0 & rotary_dim / 2, 1 & rotary_dim / 2 + 1
-            (i.e. GPT-NeoX style).
-        alibi_slopes: (nheads,) or (batch_size, nheads), fp32. A bias of
-            (-alibi_slope * |i + seqlen_k - seqlen_q - j|)
-            is added to the attention score of query i and key j.
-        num_splits: int. If > 1, split the key/value into this many chunks along the sequence.
-           If num_splits == 1, we don't split the key/value. If num_splits == 0, we use a heuristic
-           to automatically determine the number of splits.
-           Don't change this unless you know what you are doing.
-
-    Return:
-        out: (batch_size, seqlen, nheads, headdim).
-    """
     assert k_cache.stride(-1) == 1, "k_cache must have contiguous last dimension"
     assert v_cache.stride(-1) == 1, "v_cache must have contiguous last dimension"
     maybe_contiguous = lambda x: x.contiguous() if x is not None and x.stride(-1) != 1 else x
@@ -136,26 +56,31 @@ def new_flash_attn_with_kvcache(
         )
         cache_seqlens = maybe_contiguous(cache_seqlens)
     cache_batch_idx = maybe_contiguous(cache_batch_idx)
+    cache_leftpad = None # which means no left padding, cache starts from 0
     block_table = maybe_contiguous(block_table)
+    softcap = 0.0 # for llama this is absolutely 0, which means no softcap
+
     out, softmax_lse = flash_attn_cuda.fwd_kvcache(
-        q,
-        k_cache,
-        v_cache,
-        k,
-        v,
-        cache_seqlens,
-        rotary_cos,
-        rotary_sin,
-        cache_batch_idx,
-        block_table,
-        alibi_slopes,
+        q, #     <class 'torch.Tensor'>-
+        k_cache,# <class 'torch.Tensor'>-
+        v_cache,# <class 'torch.Tensor'>-
+        k,# <class 'torch.Tensor'>-
+        v,# <class 'torch.Tensor'>-
+        cache_seqlens,# <class 'torch.Tensor'>-
+        rotary_cos,# <class 'NoneType'>-
+        rotary_sin,# <class 'NoneType'>-
+        cache_batch_idx,# <class 'NoneType'>-
+        cache_leftpad,
+        block_table,# <class 'NoneType'>-
+        alibi_slopes,# <class 'NoneType'>-
         None,
-        softmax_scale,
-        causal,
+        softmax_scale,# <class 'float'>-
+        causal,# <class 'bool'>
         window_size[0],
         window_size[1],
-        rotary_interleaved,
-        num_splits,
+        softcap,# <class 'float'>-
+        rotary_interleaved,# <class 'bool'>
+        num_splits,# <class 'int'>
     )
     return out, softmax_lse
 
@@ -169,14 +94,23 @@ def get_mscale(scale=1):
 
 
 class ChunkLlamaRotaryEmbedding(nn.Module):
-    def __init__(self, dim, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None, config=None):
+    def __init__(self, dim=None, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None, config: Optional[LlamaConfig]=None):
         super().__init__()
 
-        self.max_seq_len = max_position_embeddings
-        self.dim = dim
-        self.scaling_factor = scaling_factor
-        self.max_position_embeddings = max_position_embeddings
-        self.base = base
+        if config is None:
+            self.max_seq_len = max_position_embeddings
+            self.dim = dim
+            self.scaling_factor = scaling_factor
+            self.max_position_embeddings = max_position_embeddings
+            self.base = base
+        else:
+            self.max_seq_len = config.max_position_embeddings
+            partial_rotary_factor = config.partial_rotary_factor if hasattr(config, "partial_rotary_factor") else 1.0
+            head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+            self.dim = int(head_dim * partial_rotary_factor)
+            self.scaling_factor = scaling_factor if config.rope_scaling is None else config.rope_scaling["factor"]
+            self.max_position_embeddings = config.max_position_embeddings
+            self.base = config.rope_theta
 
         # Build here to make `torch.jit.trace` work.
         self._set_cos_sin_cache(
@@ -446,6 +380,7 @@ def LlamaModel_forward(
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
+        cache_position: Optional[torch.LongTensor] = None,
 ) -> Union[Tuple, BaseModelOutputWithPast]:
     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
     output_hidden_states = (
@@ -501,10 +436,10 @@ def LlamaModel_forward(
     if inputs_embeds is None:
         inputs_embeds = self.embed_tokens(input_ids)
 
-    if self._use_flash_attention_2:
+    if self.config._attn_implementation == "flash_attention_2":
         # 2d mask is passed through the layers
         attention_mask = attention_mask if (attention_mask is not None and 0 in attention_mask) else None
-    elif self._use_sdpa and not output_attentions:
+    elif self.config._attn_implementation == "sdpa" and not output_attentions:
         # output_attentions=True can not be supported when using SDPA, and we fall back on
         # the manual implementation that requires a 4D causal mask in all cases.
         attention_mask = _prepare_4d_causal_attention_mask_for_sdpa(
@@ -583,6 +518,7 @@ def causal_forward(self,
                    output_attentions: Optional[bool] = None,
                    output_hidden_states: Optional[bool] = None,
                    return_dict: Optional[bool] = None,
+                   cache_position: Optional[torch.LongTensor] = None,
                    ) -> Union[Tuple, CausalLMOutputWithPast]:
     r"""
     Args:
@@ -609,12 +545,17 @@ def causal_forward(self,
     >>> tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
     "Hey, are you conscious? Can you talk to me?\nI'm not conscious, but I can talk to you."
     ```"""
-    raise NotImplementedError("Not implemented yet. file is /remote-home1/rxli/opencompass/opencompass/models/zgliu/chunkllama_utils/flash_decoding_chunkllama.py")
     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
     output_hidden_states = (
         output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
     )
     return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
+    if isinstance(past_key_values, Cache):
+        if len(past_key_values) == 0:
+            past_key_values = None
+        else:
+            raise NotImplementedError("past_key_values in Cache class is not supported for causal_forward")
 
     # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
     outputs = self.model(
@@ -627,6 +568,7 @@ def causal_forward(self,
         output_attentions=output_attentions,
         output_hidden_states=output_hidden_states,
         return_dict=return_dict,
+        cache_position=cache_position,
     )
 
     hidden_states = outputs[0]
@@ -713,6 +655,7 @@ def replace_with_chunkllama(pretraining_length=4096, local_window_size=None, max
     transformers.models.llama.modeling_llama.LlamaFlashAttention2.forward = forward
     transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = ChunkLlamaRotaryEmbedding
     transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = ChunkLlamaRotaryEmbedding
+
 # def replace_with_chunkllama(model, pretraining_length=4096, local_window_size=None, max_prompt_length=None):
 #     global chunk_size
 #     global local_window
