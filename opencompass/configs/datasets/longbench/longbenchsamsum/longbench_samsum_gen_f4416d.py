@@ -40,7 +40,7 @@ LongBench_samsum_datasets = [
     dict(
         type=LongBenchsamsumDataset,
         abbr='LongBench_samsum',
-        path='opencompass/Longbench',
+        path='THUDM/LongBench',
         name='samsum',
         reader_cfg=LongBench_samsum_reader_cfg,
         infer_cfg=LongBench_samsum_infer_cfg,

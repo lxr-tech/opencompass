@@ -8,7 +8,7 @@ from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 with read_base():
     from .datasets.ruler.ruler_combined_gen import ruler_combined_datasets
-    from ..configs.summarizers.groups.ruler import ruler_summary_groups
+    # from ..configs.summarizers.groups.ruler import ruler_summary_groups
 
     # from .model_xrliu.light_cache_needle import models
     from .model_xrliu.turbomind_needle import models

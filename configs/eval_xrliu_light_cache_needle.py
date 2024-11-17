@@ -5,8 +5,8 @@ from opencompass.runners import LocalRunner, DLCRunner
 from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 with read_base():    
-    # from .model_xrliu.light_cache_needle import models
-    from .model_xrliu.turbomind_needle import models
+    from .model_xrliu.light_cache_needle import models
+    # from .model_xrliu.turbomind_needle import models
     from .datasets.needlebench.needlebench.needlebench_single import needlebench_en_datasets as needlebench_origin_en_datasets
 
     # from .model_xrliu.light_cache_needle_multi import models

@@ -7,7 +7,7 @@ from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 with read_base():
     from .dataset_xrliu.long_score_long import datasets
     # from .model_xrliu.huggingface_32k import models
-    # from .model_xrliu.light_cache_32k import models
+    from .model_xrliu.light_cache_32k import models
     # from .model_xrliu.light_cache_128k import models
     from .model_xrliu.vllm_128k import models
 
