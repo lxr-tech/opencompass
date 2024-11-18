@@ -238,7 +238,7 @@ def forward(
 ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
     bsz, q_len, _ = hidden_states.size()
     chunk_len = chunk_size - local_window
-
+    print("$$$cattention_mask", attention_mask.shape, flush=True)
 
     query_states = self.q_proj(hidden_states)
     key_states = self.k_proj(hidden_states)

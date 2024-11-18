@@ -14,9 +14,9 @@ with read_base():
     from opencompass.configs.datasets.ruler.ruler_32k_gen import niah_datasets
 
 datasets = []
-datasets += ARC_e_datasets
-datasets += ARC_c_datasets
-# datasets += niah_datasets
+# datasets += ARC_e_datasets
+# datasets += ARC_c_datasets
+datasets += niah_datasets
 
 from opencompass.models import HuggingFaceCausalLM
 from opencompass.models import SelfExtend_LlamaForCausalLM
@@ -48,7 +48,7 @@ models = [
             max_seq_len=32*1024,
             max_out_len=50, 
             run_cfg=dict(num_gpus=1, num_procs=1),
-            batch_size=1,
+            batch_size=1, # support no other than `batch == 1, q_len = 1 or q_len = seq_len`
         ),
     ]
 
