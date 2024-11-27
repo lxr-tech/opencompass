@@ -13,6 +13,11 @@ from transformers import (
 from typing import Tuple
 import torch
 
+import os
+
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+# os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:24'
+
 @MODELS.register_module()
 class Llama2_H2O(HuggingFaceCausalLM):
     def load_model(self, model_id, sparsity_method) -> Tuple[LlamaForCausalLM, LlamaTokenizer]:

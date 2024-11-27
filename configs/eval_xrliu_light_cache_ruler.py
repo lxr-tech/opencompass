@@ -23,8 +23,9 @@ alillm2_data_sources = ("d-y3io773he2wcbc9pg9,d-gb3sr4nek0oo7g6t5o,d-3gpx15bjuem
 
 aliyun_cfg = dict(
     bashrc_path="/cpfs01/user/liuxiaoran/.bashrc",
-    conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1', 
-    # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-cuda12.1', 
+    conda_env_name='/cpfs01/shared/public/changcheng/environment/oc-v035-ld-v062_yoco/', 
+    # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-lmdeploy', 
+    # conda_env_name='/cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1', 
     ali_submit_dlc_path='/nas/shared/public/songdemin/code/opencompass/run_ali_task.py',
     dlc_config_path="/cpfs01/user/liuxiaoran/dlc.config",
     workspace_id=alillm2_workspace_id,

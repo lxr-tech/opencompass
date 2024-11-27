@@ -56,11 +56,15 @@ class TurboMindModelLong(BaseModel):
                          meta_template=meta_template)
         from lmdeploy.turbomind import TurboMind
 
+        import lmdeploy
         if engine_config is not None:
             from lmdeploy.messages import TurbomindEngineConfig
             engine_config = TurbomindEngineConfig(**engine_config)
         if gen_config is not None:
-            from lmdeploy.messages import EngineGenerationConfig
+            if lmdeploy.__version__ == '0.6.2':
+                from lmdeploy import GenerationConfig as EngineGenerationConfig
+            else:
+                from lmdeploy.messages import EngineGenerationConfig
             gen_config = EngineGenerationConfig(**gen_config)
         self.logger = get_logger()
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
@@ -149,6 +153,9 @@ class TurboMindModelLong(BaseModel):
         """
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
+
+        if prompt.endswith('\n\n'):
+            prompt = prompt[:-2]
 
         input_ids = self.tokenizer.encode(prompt)
         
