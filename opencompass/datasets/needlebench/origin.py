@@ -82,9 +82,29 @@ class NeedleBenchOriginDataset(BaseDataset):
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
+        def _modify_retrieval_question_for_base(retrieval_question):
+            if language == 'Chinese':
+                parts = retrieval_question.split('请按照')
+                retrieval_question = (parts[0] + '在回答之前，请思考文档中与此问题'
+                                      '最相关的内容是什么。请按照' + parts[1])
+                return retrieval_question.replace("请按照'", '')[:-16]
+            elif language == 'English':
+                parts = retrieval_question.split('Please answer in the format')
+                retrieval_question = (
+                    parts[0] + 'Before answering, please consider'
+                    ' what in the document is most relevant to this question.'
+                    ' Please answer in the format' + parts[1])
+                return retrieval_question.replace(
+                    "Please answer in the format '", '')[:-10]
+            else:
+                raise ValueError(f"Language '{language}' is not supported.")
+
         def _generate_prompt(context, retrieval_question):
             if guide:
                 retrieval_question = _modify_retrieval_question(
+                    retrieval_question)
+            else:
+                retrieval_question = _modify_retrieval_question_for_base(
                     retrieval_question)
 
             if language == 'Chinese':
@@ -131,9 +151,21 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             return prompt
 
-        files = Path(path).glob('*.jsonl')
-        for file in files:
-            if file.name not in file_list:
+        file_names = [
+            'en_un_asr.jsonl', 'zh_all.jsonl', 'PaulGrahamEssays.jsonl',
+            'multi_needle_reasoning_en.json', 'multi_needle_reasoning_zh.json',
+            'zh_finance.jsonl', 'zh_game.jsonl', 'zh_general.jsonl',
+            'zh_government.jsonl', 'zh_movie.jsonl', 'zh_tech.jsonl'
+        ]
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
+            path = snapshot_download(repo_id=path, repo_type='dataset')
+        needle_file_path = os.path.join(path, needle_file_name)
+
+        for file_name in file_names:
+            file_path = os.path.join(path, file_name)
+            if file_name not in file_list:
                 continue
 
             with open(file, 'r', encoding='utf-8') as f:

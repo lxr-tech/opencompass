@@ -3,6 +3,7 @@ from .ai360_api import AI360GPT  # noqa: F401
 from .alaya import AlayaLM  # noqa: F401
 from .baichuan_api import BaiChuan  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
+from .bailing_api_oc import BailingAPI  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
@@ -20,11 +21,10 @@ from .huggingface_above_v4_33 import HuggingFaceBaseModel  # noqa: F401
 from .huggingface_above_v4_33 import HuggingFacewithChatTemplate  # noqa: F401
 from .hunyuan_api import Hunyuan  # noqa: F401
 from .intern_model import InternLM  # noqa: F401
+from .interntrain import InternTrain  # noqa: F401
 from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI, LightllmChatAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401
-from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401
-from .lmdeploy_tis import LmdeployTisModel  # noqa: F401
 from .minimax_api import MiniMax, MiniMaxChatCompletionV2  # noqa: F401
 from .mistral_api import Mistral  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
@@ -39,7 +39,6 @@ from .rendu_api import Rendu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
-from .turbomind_tis import TurboMindTisModel  # noqa: F401
 from .turbomind_with_tf_above_v4_33 import \
     TurboMindModelwithChatTemplate  # noqa: F401
 from .unigpt_api import UniGPT  # noqa: F401
@@ -55,11 +54,11 @@ from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
 # 每个人自己提交的时候把自己的类都注释掉再提交，提交完后再解除注释使用
 # 使用过程中，如果使用别人已经实现的类，先复制到自己的路径下再修改使用
 
-# from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
-# from .xrliu.huggingface_long import HuggingFaceModel
-# from .xrliu.turbomind_long import TurboMindModelLong
-# from .xrliu.turbomind_short import TurboMindModelShort
-# from .xrliu.infllm_model import InfLLM_xrliu
+from .xrliu.light_cache.light_cache_wrapper import LightCacheCausalLM
+from .xrliu.huggingface_long import HuggingFaceModel
+from .xrliu.turbomind_long import TurboMindModelLong
+from .xrliu.turbomind_short import TurboMindModelShort
+from .xrliu.infllm_model import InfLLM_xrliu
 # from .xrliu.vllm_long import VLLMCausalLM
 
 # from .zgliu.llama2_h2o import Llama2_H2O

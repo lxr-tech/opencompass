@@ -40,7 +40,7 @@ LongBench_triviaqa_datasets = [
     dict(
         type=LongBenchtriviaqaDataset,
         abbr='LongBench_triviaqa',
-        path='THUDM/LongBench',
+        path='opencompass/Longbench',
         name='triviaqa',
         reader_cfg=LongBench_triviaqa_reader_cfg,
         infer_cfg=LongBench_triviaqa_infer_cfg,

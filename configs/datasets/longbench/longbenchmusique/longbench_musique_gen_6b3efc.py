@@ -34,7 +34,7 @@ LongBench_musique_datasets = [
     dict(
         type=LongBenchmusiqueDataset,
         abbr='LongBench_musique',
-        path='THUDM/LongBench',
+        path='opencompass/Longbench',
         name='musique',
         reader_cfg=LongBench_musique_reader_cfg,
         infer_cfg=LongBench_musique_infer_cfg,

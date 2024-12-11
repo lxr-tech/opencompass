@@ -2,14 +2,14 @@ from mmengine.config import read_base
 
 with read_base():
 
-    from ..datasets.gsm8k.gsm8k_gen_17d0dc import gsm8k_datasets  # modified in 240907
+    # from ..datasets.gsm8k.gsm8k_gen_17d0dc import gsm8k_datasets  # modified in 240907
 
-    from ..datasets.ARC_e.ARC_e_ppl_a450bd import ARC_e_datasets                             # zero shot
-    from ..datasets.ARC_c.ARC_c_ppl_a450bd import ARC_c_datasets                             # zero shot
+    # from ..datasets.ARC_e.ARC_e_ppl_a450bd import ARC_e_datasets                             # zero shot
+    # from ..datasets.ARC_c.ARC_c_ppl_a450bd import ARC_c_datasets                             # zero shot
 
-    from ..datasets.mmlu.mmlu_ppl_ac766d import mmlu_datasets                                # 5-shot
-    from ..datasets.ceval.ceval_ppl_578f8d import ceval_datasets                             # 5-shot
-    from ..datasets.cmmlu.cmmlu_ppl_8b9c76 import cmmlu_datasets
+    # from ..datasets.mmlu.mmlu_ppl_ac766d import mmlu_datasets                                # 5-shot
+    # from ..datasets.ceval.ceval_ppl_578f8d import ceval_datasets                             # 5-shot
+    # from ..datasets.cmmlu.cmmlu_ppl_8b9c76 import cmmlu_datasets
     
     from ..datasets.longbench.longbenchnarrativeqa.longbench_narrativeqa_gen import LongBench_narrativeqa_datasets
     from ..datasets.longbench.longbenchqasper.longbench_qasper_gen import LongBench_qasper_datasets

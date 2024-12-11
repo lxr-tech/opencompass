@@ -34,7 +34,7 @@ LongBench_vcsum_datasets = [
     dict(
         type=LongBenchvcsumDataset,
         abbr='LongBench_vcsum',
-        path='THUDM/LongBench',
+        path='opencompass/Longbench',
         name='vcsum',
         reader_cfg=LongBench_vcsum_reader_cfg,
         infer_cfg=LongBench_vcsum_infer_cfg,

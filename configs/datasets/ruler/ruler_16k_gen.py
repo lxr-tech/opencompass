@@ -6,11 +6,10 @@ with read_base():
     from .ruler_vt_gen import vt_datasets  # VT
     from .ruler_fwe_gen import fwe_datasets  # FWE
     from .ruler_cwe_gen import cwe_datasets  # CWE
-    from .ruler_cwe4_gen import cwe4_datasets  # CWE
     from .ruler_qa_gen import qa_datasets  # QA
 
 
-import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+import_ds = sum((niah, vt, fwe, cwe, qa), [])
 
 # Evaluation config
 NUM_SAMPLES = 100 # Change to the number of samples you need
@@ -22,7 +21,7 @@ ruler_datasets = []
 
 # Different seq length
 for max_seq_len, abbr_suffix in zip(max_seq_lens, abbr_suffixs):
-    for dataset in import_datasets:
+    for dataset in import_ds:
         tmp_dataset = dataset.deepcopy()
         tmp_dataset['abbr'] = tmp_dataset['abbr'] + '_' + abbr_suffix
         tmp_dataset['num_samples'] = NUM_SAMPLES

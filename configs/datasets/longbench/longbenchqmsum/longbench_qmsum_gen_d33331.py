@@ -34,7 +34,7 @@ LongBench_qmsum_datasets = [
     dict(
         type=LongBenchqmsumDataset,
         abbr='LongBench_qmsum',
-        path='THUDM/LongBench',
+        path='opencompass/Longbench',
         name='qmsum',
         reader_cfg=LongBench_qmsum_reader_cfg,
         infer_cfg=LongBench_qmsum_infer_cfg,

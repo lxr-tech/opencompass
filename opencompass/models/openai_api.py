@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -9,6 +10,7 @@ from typing import Dict, List, Optional, Union
 import httpx
 import jieba
 import requests
+from tqdm import tqdm
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
@@ -19,6 +21,8 @@ PromptType = Union[PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions')
+OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
+                                    'https://api.openai.com/v1/')
 
 O1_MODEL_LIST = [
     'o1-preview-2024-09-12',
@@ -170,9 +174,11 @@ class OpenAI(BaseAPIModel):
 
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, inputs,
-                             [max_out_len] * len(inputs),
-                             [temperature] * len(inputs)))
+                tqdm(executor.map(self._generate, inputs,
+                                  [max_out_len] * len(inputs),
+                                  [temperature] * len(inputs)),
+                     total=len(inputs),
+                     desc='Inferencing'))
         return results
 
     def _generate(self, input: PromptType, max_out_len: int,
@@ -466,25 +472,28 @@ class OpenAI(BaseAPIModel):
 
 class OpenAISDK(OpenAI):
 
-    def __init__(self,
-                 path: str = 'gpt-3.5-turbo',
-                 max_seq_len: int = 4096,
-                 query_per_second: int = 1,
-                 rpm_verbose: bool = False,
-                 retry: int = 2,
-                 key: str | List[str] = 'ENV',
-                 org: str | List[str] | None = None,
-                 meta_template: Dict | None = None,
-                 openai_api_base: str = OPENAI_API_BASE,
-                 openai_proxy_url: Optional[str] = None,
-                 mode: str = 'none',
-                 logprobs: bool | None = False,
-                 top_logprobs: int | None = None,
-                 temperature: float | None = None,
-                 tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None,
-                 max_completion_tokens: int = 16384,
-                 verbose: bool = False):
+    def __init__(
+        self,
+        path: str = 'gpt-3.5-turbo',
+        max_seq_len: int = 4096,
+        query_per_second: int = 1,
+        rpm_verbose: bool = False,
+        retry: int = 2,
+        key: str | List[str] = 'ENV',
+        org: str | List[str] | None = None,
+        meta_template: Dict | None = None,
+        openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+        openai_proxy_url: Optional[str] = None,
+        mode: str = 'none',
+        logprobs: bool | None = False,
+        top_logprobs: int | None = None,
+        temperature: float | None = None,
+        tokenizer_path: str | None = None,
+        extra_body: Dict | None = None,
+        max_completion_tokens: int = 16384,
+        verbose: bool = False,
+        status_code_mappings: dict = {},
+    ):
         super().__init__(path,
                          max_seq_len,
                          query_per_second,
@@ -505,6 +514,10 @@ class OpenAISDK(OpenAI):
                          max_completion_tokens=max_completion_tokens)
         from openai import OpenAI
 
+        # support multiple api_base for acceleration
+        if isinstance(openai_api_base, List):
+            openai_api_base = random.choice(openai_api_base)
+
         if self.proxy_url is None:
             self.openai_client = OpenAI(base_url=openai_api_base, api_key=key)
         else:
@@ -519,9 +532,11 @@ class OpenAISDK(OpenAI):
                 http_client=httpx.Client(proxies=proxies))
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
+        self.status_code_mappings = status_code_mappings
 
     def _generate(self, input: PromptList | str, max_out_len: int,
                   temperature: float) -> str:
+        from openai import APIStatusError, BadRequestError
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
@@ -601,7 +616,32 @@ class OpenAISDK(OpenAI):
                 if self.verbose:
                     self.logger.info(
                         'Successfully get response from OpenAI API')
+                    try:
+                        self.logger.info(responses)
+                    except Exception as e:  # noqa F841
+                        pass
+                if not responses.choices:
+                    self.logger.error(
+                        'Response is empty, it is an internal server error \
+                            from the API provider.')
                 return responses.choices[0].message.content
+
+            except (BadRequestError, APIStatusError) as e:
+                # Handle BadRequest status
+                # You can specify self.status_code_mappings to bypass \
+                # API sensitivity blocks
+                # For example: status_code_mappings={400: 'Input data \
+                # may contain inappropriate content.'}
+                status_code = e.status_code
+                if (status_code is not None
+                        and status_code in self.status_code_mappings):
+                    error_message = self.status_code_mappings[status_code]
+                    self.logger.info(f'Status Code: {status_code},\n'
+                                     f'Original Error Message: {e},\n'
+                                     f'Return Message: {error_message} ')
+                    return error_message
+                else:
+                    self.logger.error(e)
             except Exception as e:
                 self.logger.error(e)
             num_retries += 1
