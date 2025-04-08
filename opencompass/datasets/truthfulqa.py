@@ -10,6 +10,37 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
 
+import os
+from datasets import load_from_disk
+
+def load_local_dataset(**kwargs):
+    path = kwargs.pop("path")
+    name = kwargs.pop("name", '')
+    split = kwargs.get("split", "")
+    data_files = kwargs.get("data_files", None)
+    if data_files is not None:
+        raise NotImplementedError
+    local_path = os.path.join("./data", path, name, split)
+    print(f"Load hf dataset from local path {local_path} with kwargs {kwargs} ...")
+    assert os.path.exists(local_path)
+    return load_from_disk(local_path, **kwargs)
+
+
+class TruthfulQADatasetForMC(BaseDataset):
+
+    @staticmethod
+    def load(**kwargs):
+        dataset = load_local_dataset(**kwargs)
+
+        def preprocess(example):
+            for i in range(4):
+                example[chr(ord('A') + i)] = example['choices'][i]
+            return example
+
+        dataset = dataset.map(preprocess).remove_columns(['choices'])
+        return dataset
+
+
 if is_npu_available():
     backend = 'npu'
 elif torch.cuda.is_available():

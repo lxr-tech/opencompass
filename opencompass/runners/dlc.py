@@ -15,7 +15,7 @@ from mmengine.config import ConfigDict
 from mmengine.utils import track_parallel_progress
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import get_logger
 
 from .base import BaseRunner
 
@@ -35,17 +35,15 @@ class DLCRunner(BaseRunner):
         lark_bot_url (str): Lark bot url. Default: None.
     """
 
-    def __init__(
-        self,
-        task: ConfigDict,
-        aliyun_cfg: ConfigDict,
-        max_num_workers: int = 32,
-        eval_with_gpu: list = ['plugin_eval'],
-        retry: int = 2,
-        debug: bool = False,
-        lark_bot_url: str = None,
-        keep_tmp_file: bool = True,
-    ):
+    def __init__(self,
+                 task: ConfigDict,
+                 aliyun_cfg: ConfigDict,
+                 max_num_workers: int = 32,
+                 eval_with_gpu: list = ['plugin_eval'],
+                 retry: int = 2,
+                 debug: bool = False,
+                 lark_bot_url: str = None,
+                 keep_tmp_file: bool = False):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
@@ -53,10 +51,6 @@ class DLCRunner(BaseRunner):
 
         self.eval_with_gpu = eval_with_gpu
         self.keep_tmp_file = keep_tmp_file
-        if lark_bot_url:
-            self.lark_reporter = LarkReporter(lark_bot_url)
-        else:
-            self.lark_reporter = None
         logger = get_logger()
         logger.warning(
             'To ensure the integrity of the log results, the log displayed '
@@ -74,12 +68,10 @@ class DLCRunner(BaseRunner):
         """
 
         if not self.debug:
-            status = track_parallel_progress(
-                self._launch,
-                tasks,
-                nproc=self.max_num_workers,
-                keep_order=False,
-            )
+            status = track_parallel_progress(self._launch,
+                                             tasks,
+                                             nproc=self.max_num_workers,
+                                             keep_order=False)
         else:
             status = [self._launch(task, random_sleep=False) for task in tasks]
         return status
@@ -100,7 +92,7 @@ class DLCRunner(BaseRunner):
             tuple[str, int]: Task name and exit code.
         """
         if random_sleep is None:
-            random_sleep = self.max_num_workers > 32
+            random_sleep = (self.max_num_workers > 32)
 
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
@@ -117,7 +109,6 @@ class DLCRunner(BaseRunner):
         mmengine.mkdir_or_exist('tmp/')
         # Using uuid to avoid filename conflict
         import uuid
-
         uuid_str = str(uuid.uuid4())
         param_file = f'tmp/{uuid_str}_params.py'
         pwd = os.getcwd()
@@ -189,7 +180,8 @@ class DLCRunner(BaseRunner):
                 dlc_job_cmd = 'submit pytorchjob'
                 worker_cmd = ' --workers 1'
             tmpl = (
-                f'dlc {dlc_job_cmd}'
+                # f'/cpfs01/shared/public/dlc {dlc_job_cmd}'
+                f'/cpfs01/shared/public/sunyu2/tools/dlc/dlc {dlc_job_cmd}'
                 f" --command '{shell_cmd}'"
                 f' --name {task_name[:512]}'
                 f'{config_path}'
@@ -201,7 +193,8 @@ class DLCRunner(BaseRunner):
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
+                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}"
+                f" --enable_preemptible_job={self.aliyun_cfg.get('enable_preemptible_job', False)}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
@@ -210,8 +203,7 @@ class DLCRunner(BaseRunner):
             if self.aliyun_cfg['python_env_path']:
                 cmd = cmd.replace(
                     sys.executable,
-                    f'{self.aliyun_cfg["python_env_path"]}/bin/python',
-                )
+                    f'{self.aliyun_cfg["python_env_path"]}/bin/python')
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
@@ -268,10 +260,11 @@ class DLCRunner(BaseRunner):
                         time.sleep(2)
                         try:
                             raw_job_info = subprocess.getoutput(
-                                f'dlc get job {job_id}{config_path}')
-                            if (raw_job_info.startswith('/bin/bash')
-                                    or raw_job_info.startswith('[OK]')
-                                    or raw_job_info.startswith('[FAILED]')):
+                                f'/cpfs01/shared/public/dlc get job {job_id}{config_path}')
+                            if raw_job_info.startswith(
+                                    '/bin/bash') or raw_job_info.startswith(
+                                        '[OK]') or raw_job_info.startswith(
+                                            '[FAILED]'):
                                 raw_job_info = raw_job_info[raw_job_info.
                                                             index('\n') + 1:]
                             job_info = json.loads(raw_job_info)
@@ -305,7 +298,7 @@ class DLCRunner(BaseRunner):
                     elasped_time = datetime.datetime.now() - initial_time
                     cur_time = (pod_create_time +
                                 elasped_time).strftime('%Y-%m-%dT%H:%M:%SZ')
-                    logs_cmd = ('dlc logs'
+                    logs_cmd = ('/cpfs01/shared/public/dlc logs'
                                 f' {job_id} {job_id}-master-0'
                                 f'{config_path}'
                                 f' --start_time {pri_time}'
@@ -333,11 +326,6 @@ class DLCRunner(BaseRunner):
                 os.remove(param_file)
             else:
                 pass
-
-        # Lark Report when failed
-        if return_code == -1 and self.lark_reporter is not None:
-            content = f'DLC job failed. Task name: {task_name}'
-            self.lark_reporter.post(title='DLC job failed', content=content)
 
         return task_name, return_code
 
