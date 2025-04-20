@@ -24,7 +24,7 @@ for index, config in enumerate(qa_configurations):
                 template=dict(
                     round=[
                         dict(role='HUMAN', prompt='{prompt}'),
-                        dict(role='BOT', prompt='{answer}\n'),
+                        # dict(role='BOT', prompt='{answer}\n'),
                     ]
                 ),
             ),
