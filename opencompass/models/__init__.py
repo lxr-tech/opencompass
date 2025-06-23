@@ -49,3 +49,6 @@ from .yayi_api import Yayi  # noqa: F401
 from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
+
+from .xrliu.hippo_attn.mask_dim_wrapper import MaskDimCausalLM
+from .xrliu.llada.llada_wrapper import LLaDACausalLM

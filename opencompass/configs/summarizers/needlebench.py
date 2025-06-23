@@ -120,6 +120,10 @@ def create_summarizer(context_lengths, depths, dataset_size,
     return summarizer_config
 
 
+context_lengths = list([4000, 8000, 16000, 24000, 32000])
+depths = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+needlebench_summarizer = create_summarizer(context_lengths, depths, '')
+
 depths = [0, 5, 10, 15, 21, 26, 31, 36, 42, 47, 52, 57, 63, 68, 73, 78, 84, 89, 94, 100]
 depths_list_sparse = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 

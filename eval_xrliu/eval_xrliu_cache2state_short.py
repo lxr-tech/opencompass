@@ -25,13 +25,25 @@ with read_base():
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 batch_size = {
-    'llama3_2_3b': 8, 'llama3_1_8b': 8, 'qwen2_5_1b': 8, 'qwen2_5_7b': 8, 
-    'qwq_32b': 1, 'r1_distill_32b': 1, 
+    'llama3_2_3b': 8, 'llama3_2_3b_chat': 8, 'llama3_1_8b': 8, 'llama3_1_8b_chat': 8, 
+
+    'qwen3_4b_base': 8, 'qwen3_4b': 8, 'qwen3_8b_base': 8, 'qwen3_8b': 8, 
+
+    'qwen2_5_7b': 8, 'qwen2_5_7b_chat': 8, 'qwen2_5_3b': 8, 'qwen2_5_3b_chat': 8, 
+    'qwen2_5_1b': 8, 'qwen2_5_1b_chat': 8, 'qwen2_5_500m': 8, 
+    
+    'qwen2_5_7b_long': 8, 'qwen2_5_14b_long': 4, 
+
+    'internlm2_5_7b': 8, 'internlm3_8b_chat': 8, 
+
+    'qwen2_5_32b': 1, 'qwen2_5_32b_chat': 1, 'qwq_32b': 1, 'r1_distill_32b': 1, 
 }
 
 models = [
     ('llama3_2_3b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Llama-3.2-3B/'),
+    ('llama3_2_3b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Llama-3.2-3B-Instruct/'),
     ('llama3_1_8b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Llama-3.1-8B/'),
+    ('llama3_1_8b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Llama-3.1-8B-Instruct/'),
 
     # ('llama3_2_3b-250413-step200-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/liuxiaoran-240108120089/train/saves/llama3.2-3B-pt-baseline/checkpoint-200'), 
     # ('llama3_2_3b-250413-step992-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/liuxiaoran-240108120089/train/saves/llama3.2-3B-pt-baseline/checkpoint-992'), 
@@ -42,10 +54,28 @@ models = [
 
     # ('llama3_2_3b-250413-c2s_rfm_sort2_14_rp-step992-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/liuxiaoran-240108120089/train/saves/llama3.2-3B-fla-rp-sort2/checkpoint-992'), 
 
+    ('internlm3_8b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/internlm3-8b-instruct/'), 
+
+    ('qwen3_4b_base-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen3-4B-Base/'), 
+    ('qwen3_4b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen3-4B/'), 
+    ('qwen3_8b_base-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen3-8B-Base/'), 
+    ('qwen3_8b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen3-8B/'), 
+
+    ('qwen2_5_500m-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-0.5B/'), 
     ('qwen2_5_1b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-1.5B/'), 
+    ('qwen2_5_1b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-1.5B-Instruct/'), 
+    ('qwen2_5_3b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-3B/'), 
+    ('qwen2_5_3b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-3B-Instruct/'), 
     ('qwen2_5_7b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B/'), 
+    ('qwen2_5_7b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B-Instruct/'), 
+
+    ('qwen2_5_7b_long-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B-Instruct-1M/'), 
+    ('qwen2_5_14b_long-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-14B-Instruct-1M/'), 
+
+    ('qwen2_5_32b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-32B/'), 
+    ('qwen2_5_32b_chat-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-32B-Instruct/'), 
     ('qwq_32b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/QwQ-32B-Preview/'),
-    ('r1_distill_32b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/DeepSeek-R1-Distill-Qwen-32B/'),
+    # ('r1_distill_32b-2k', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/DeepSeek-R1-Distill-Qwen-32B/'),
 ]
 
 models = [
@@ -62,7 +92,7 @@ infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=1000, gen_task_coef=15),
     runner=dict(
         type=LocalRunner,
-        max_num_workers=4, retry=2, 
+        # max_num_workers=2, retry=2, 
         task=dict(type=OpenICLInferTask),
     ),
 )

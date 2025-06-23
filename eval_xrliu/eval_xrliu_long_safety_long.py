@@ -58,7 +58,7 @@ with read_base():
     # from opencompass.configs.datasets.leval.levalmeetingsumm.leval_meetingsumm_gen import LEval_meetingsumm_datasets
     # from opencompass.configs.datasets.leval.levalreviewsumm.leval_review_summ_gen import LEval_review_summ_datasets
 
-    from opencompass.configs.datasets.longbenchv2.longbenchv2_gen_no_cot import LongBenchv2_datasets
+    # from opencompass.configs.datasets.longbenchv2.longbenchv2_gen_no_cot import LongBenchv2_datasets
 
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

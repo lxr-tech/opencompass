@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
@@ -108,6 +109,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             if language == 'Chinese':
                 if position == 'End':
+                    retrieval_question = retrieval_question.replace("请按照'", '')[:-16]
                     prompt = ('你是一个善于回答用户问题的智能AI助手\n'
                               '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
                               '，或重复你的回答\n'
@@ -124,6 +126,7 @@ class NeedleBenchOriginDataset(BaseDataset):
                                      'Position must be "End" or "Start".')
             elif language == 'English':
                 if position == 'End':
+                    retrieval_question = retrieval_question.replace("Please answer in the format '", '')[:-10]
                     prompt = ('You are an intelligent AI assistant skilled in '
                               'answering user questions.\n'
                               'Please keep your answers concise and clear. Do '
@@ -171,8 +174,8 @@ class NeedleBenchOriginDataset(BaseDataset):
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-                random_needle = get_random_line_by_language(
-                    counter, needle_file_path, language)
+                needle_file_path = os.path.join(path, needle_file_name)
+                random_needle = get_random_line_by_language(counter, file_path=needle_file_path, language=language)
                 needle = '\n' + random_needle['needle'] + '\n'
                 retrieval_question = random_needle['retrieval_question']
                 keyword = random_needle['keyword']
@@ -204,7 +207,7 @@ class NeedleBenchOriginDataset(BaseDataset):
             'prompt': data['prompt'],
             'answer': data['answer'],
         })
-        return dataset
+        return dataset  # Dataset.from_dict({'test': dataset})
 
 
 class NeedleBenchOriginEvaluator(BaseEvaluator):
