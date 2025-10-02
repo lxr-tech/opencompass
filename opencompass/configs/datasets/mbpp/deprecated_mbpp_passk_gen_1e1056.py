@@ -33,8 +33,8 @@ mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator), pred_role='BOT')
 mbpp_datasets = [
     dict(
         type=MBPPDatasetV2,
-        abbr='mbpp_passk',
-        path='./data/mbpp/mbpp.jsonl',
+        abbr='deprecated_mbpp_passk',
+        path='opencompass/mbpp',  # './data/mbpp/mbpp.jsonl',
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg,

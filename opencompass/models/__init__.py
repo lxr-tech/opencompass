@@ -52,3 +52,13 @@ from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
 
 from .xrliu.hippo_attn.mask_dim_wrapper import MaskDimCausalLM
 from .xrliu.llada.llada_wrapper import LLaDACausalLM
+from .xrliu.rope_pp.rope_pp_v0820_wrapper import RoPEPPCausalLM_v0820
+from .xrliu.rope_pp.rope_pp_v0827_wrapper import RoPEPPCausalLM_v0827
+from .xrliu.rope_pp.rope_pp_v0912_wrapper import RoPEPPCausalLM_v0912
+from .xrliu.rope_pp.rope_pp_v0926_wrapper import RoPEPPCausalLM_v0926
+from .xrliu.rope_pp.fope_wrapper import FoPECausalLM
+from .xrliu.rope_pp.mask_wrapper import MaskCausalLM
+
+# from .xrliu.rope_pp.path_wrapper import PaTHCausalLM
+
+from .xrliu.rope_pp.rope_pp_dllm_wrapper import RoPEPPdLLM

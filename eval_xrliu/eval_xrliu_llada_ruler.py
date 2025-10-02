@@ -78,11 +78,11 @@ models = [
     # ('llada_8b_base-o64_b64_s64-ntk14', {'scaling_factor': 14}, {'steps': 64, 'block_length': 64, }, 64), 
     # ('llada_8b_base-o64_b64_s64-ntk31', {'scaling_factor': 31}, {'steps': 64, 'block_length': 64, }, 64), 
 
-    ('llada_8b_chat-o64_b64_s64', {}, {'steps': 64, 'block_length': 64, }, 64), 
+    # ('llada_8b_chat-o64_b64_s64', {}, {'steps': 64, 'block_length': 64, }, 64), 
 
-    ('llada_8b_chat-o64_b64_s64-ntk4', {'scaling_factor': 4}, {'steps': 64, 'block_length': 64, }, 64), 
-    ('llada_8b_chat-o64_b64_s64-ntk14', {'scaling_factor': 14}, {'steps': 64, 'block_length': 64, }, 64), 
-    ('llada_8b_chat-o64_b64_s64-ntk31', {'scaling_factor': 31}, {'steps': 64, 'block_length': 64, }, 64), 
+    # ('llada_8b_chat-o64_b64_s64-ntk4', {'scaling_factor': 4}, {'steps': 64, 'block_length': 64, }, 64), 
+    # ('llada_8b_chat-o64_b64_s64-ntk14', {'scaling_factor': 14}, {'steps': 64, 'block_length': 64, }, 64), 
+    # ('llada_8b_chat-o64_b64_s64-ntk31', {'scaling_factor': 31}, {'steps': 64, 'block_length': 64, }, 64), 
 
     # ('llada_1_5_8b-o64_b64_s64', {}, {'steps': 64, 'block_length': 64, }, 64), 
 
@@ -90,12 +90,18 @@ models = [
     # ('llada_1_5_8b-o64_b64_s64-ntk14', {'scaling_factor': 14}, {'steps': 64, 'block_length': 64, }, 64), 
     # ('llada_1_5_8b-o64_b64_s64-ntk31', {'scaling_factor': 31}, {'steps': 64, 'block_length': 64, }, 64), 
 
-    # ('dream_v0_7b_base-o64_s64', {}, {'steps': 64, }, 64), 
+    ('dream_v0_7b_base-o64_s64-de', {}, {'steps': 64, }, 64), 
+    # ('dream_v0_7b_base-o64_s64-de-ntk2', {'scaling_factor': 2}, {'steps': 64, }, 64), 
+    ('dream_v0_7b_base-o64_s64-de-ntk5', {'scaling_factor': 5}, {'steps': 64, }, 64), 
+    ('dream_v0_7b_base-o64_s64-de-ntk25', {'scaling_factor': 25}, {'steps': 64, }, 64), 
 
     # ('dream_v0_7b_base-o64_s64-ntk5', {'scaling_factor': 5}, {'steps': 64, }, 64), 
 
-    # ('dream_v0_7b_chat-o64_s64', {}, {'steps': 64, }, 64), 
-    
+    ('dream_v0_7b_chat-o64_s64-de', {}, {'steps': 64, }, 64), 
+    # ('dream_v0_7b_chat-o64_s64-de-ntk2', {'scaling_factor': 2}, {'steps': 64, }, 64), 
+    ('dream_v0_7b_chat-o64_s64-de-ntk5', {'scaling_factor': 5}, {'steps': 64, }, 64), 
+    ('dream_v0_7b_chat-o64_s64-de-ntk25', {'scaling_factor': 25}, {'steps': 64, }, 64), 
+
     # ('dream_v0_7b_chat-o64_s64-ntk5', {'scaling_factor': 5}, {'steps': 64, }, 64), 
 
 ]

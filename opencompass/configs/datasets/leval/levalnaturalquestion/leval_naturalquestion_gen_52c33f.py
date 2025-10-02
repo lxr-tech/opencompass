@@ -35,7 +35,7 @@ LEval_nq_datasets = [
     dict(
         type=LEvalNaturalQuestionDataset,
         abbr='LEval_nq',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='natural_question',
         reader_cfg=LEval_nq_reader_cfg,
         infer_cfg=LEval_nq_infer_cfg,

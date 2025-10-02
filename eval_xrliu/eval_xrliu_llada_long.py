@@ -66,8 +66,8 @@ path_dict = {
 }
 
 models = [
-    ('llama_3_8b_base-o512-ntk4-16k', {'scaling_factor': 4}, {}, 15500, 512), 
-    ('llama_3_8b_chat-o512-ntk4-16k', {'scaling_factor': 4}, {}, 15500, 512), 
+    # ('llama_3_8b_base-o512-ntk4-16k', {'scaling_factor': 4}, {}, 15500, 512), 
+    # ('llama_3_8b_chat-o512-ntk4-16k', {'scaling_factor': 4}, {}, 15500, 512), 
 
     # ('llada_8b_base-o512_b64_s512-8k', {}, {'steps': 512, 'block_length': 64, }, 7500, 512), 
     # ('llada_8b_base-o512_b64_s512-ntk4-8k', {'scaling_factor': 4}, {'steps': 512, 'block_length': 64, }, 7500, 512), 
@@ -76,6 +76,13 @@ models = [
 
     # ('llada_1_5_8b-o512_b64_s512-8k', {}, {'steps': 512, 'block_length': 64, }, 7500, 512), 
     # ('llada_1_5_8b-o512_b64_s512-ntk4-8k', {'scaling_factor': 4}, {'steps': 512, 'block_length': 64, }, 7500, 512), 
+
+    # ('dream_v0_7b_base-o512_s512-de-8k', {}, {'steps': 512, }, 7500, 512), 
+    # ('dream_v0_7b_base-o512_s512-de-ntk5-8k', {'scaling_factor': 5}, {'steps': 512, }, 7500, 512), 
+    ('dream_v0_7b_base-o512_s512-de-ntk25-8k', {'scaling_factor': 25}, {'steps': 512, }, 7500, 512), 
+    # ('dream_v0_7b_chat-o512_s512-de-8k', {}, {'steps': 512, }, 7500, 512), 
+    # ('dream_v0_7b_chat-o512_s512-de-ntk5-8k', {'scaling_factor': 5}, {'steps': 512, }, 7500, 512), 
+    ('dream_v0_7b_chat-o512_s512-de-ntk25-8k', {'scaling_factor': 25}, {'steps': 512, }, 7500, 512), 
 
     # ('llama_3_8b_base-o512-8k', {}, {}, 7500, 512), 
     # ('llama_3_8b_chat-o512-8k', {}, {}, 7500, 512), 
@@ -87,6 +94,13 @@ models = [
 
     # ('llada_1_5_8b-o512_b64_s512-4k', {}, {'steps': 512, 'block_length': 64, }, 3500, 512), 
     # ('llada_1_5_8b-o512_b64_s512-ntk4-4k', {'scaling_factor': 4}, {'steps': 512, 'block_length': 64, }, 3500, 512), 
+
+    # ('dream_v0_7b_base-o512_s512-de-4k', {}, {'steps': 512, }, 3500, 512), 
+    # ('dream_v0_7b_base-o512_s512-de-ntk5-4k', {'scaling_factor': 5}, {'steps': 512, }, 3500, 512), 
+    ('dream_v0_7b_base-o512_s512-de-ntk25-4k', {'scaling_factor': 25}, {'steps': 512, }, 3500, 512), 
+    # ('dream_v0_7b_chat-o512_s512-de-4k', {}, {'steps': 512, }, 3500, 512), 
+    # ('dream_v0_7b_chat-o512_s512-de-ntk5-4k', {'scaling_factor': 5}, {'steps': 512, }, 3500, 512), 
+    ('dream_v0_7b_chat-o512_s512-de-ntk25-4k', {'scaling_factor': 25}, {'steps': 512, }, 3500, 512), 
 
     # ('dream_v0_7b_base-o512_s512-4k', {}, {'steps': 512, }, 3500, 512), 
     # ('dream_v0_7b_base-o512_s512-ntk5-4k', {'scaling_factor': 5}, {'steps': 512, }, 3500, 512), 

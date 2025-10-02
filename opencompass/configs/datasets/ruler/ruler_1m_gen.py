@@ -3,14 +3,14 @@ import os
 from mmengine.config import read_base
 
 with read_base():
+    from .ruler_niah_gen import niah_datasets as niah  # Niah
     from .ruler_cwe_gen import cwe_datasets as cwe  # CWE
     from .ruler_fwe_gen import fwe_datasets as fwe  # FWE
-    from .ruler_niah_gen import niah_datasets as niah  # Niah
-    from .ruler_qa_gen import qa_datasets as qa  # QA
     from .ruler_vt_gen import vt_datasets as vt  # VT
+    from .ruler_qa_gen import qa_datasets as qa  # QA
 
 
-import_ds = sum((cwe, fwe, niah, qa, vt), [])
+import_ds = sum((niah, cwe, fwe, vt, qa), [])
 
 # Evaluation config
 NUM_SAMPLES = 100 # Change to the number of samples you need

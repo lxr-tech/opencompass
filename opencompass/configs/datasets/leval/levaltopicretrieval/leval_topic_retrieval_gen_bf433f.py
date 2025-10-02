@@ -37,7 +37,7 @@ LEval_tr_datasets = [
     dict(
         type=LEvalTopicRetrievalDataset,
         abbr='LEval_topic_retrieval',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='topic_retrieval_longchat',
         reader_cfg=LEval_tr_reader_cfg,
         infer_cfg=LEval_tr_infer_cfg,

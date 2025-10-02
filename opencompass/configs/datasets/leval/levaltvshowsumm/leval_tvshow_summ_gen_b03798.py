@@ -35,7 +35,7 @@ LEval_tvshow_summ_datasets = [
     dict(
         type=LEvalTVShowSummDataset,
         abbr='LEval_tvshow_summ',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='tv_show_summ',
         reader_cfg=LEval_tvshow_summ_reader_cfg,
         infer_cfg=LEval_tvshow_summ_infer_cfg,

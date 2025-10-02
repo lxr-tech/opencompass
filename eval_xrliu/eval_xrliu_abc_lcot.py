@@ -83,7 +83,7 @@ models = [
     ) for abbr, path in models
 ]
 
-work_dir = './outputs_xrliu/cache2state_lcot/'
+work_dir = './outputs_xrliu/llm_lcot/'
 
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=1000, gen_task_coef=15),
@@ -107,5 +107,5 @@ eval = dict(
 
 # source /cpfs01/user/liuxiaoran/.bashrc
 # conda activate /cpfs01/user/liuxiaoran/miniconda3/envs/llm-torch2.1
-# python run.py eval_xrliu/eval_xrliu_cache2state_lcot.py --dump-eval-details --debug -r  调试用
-# python run.py eval_xrliu/eval_xrliu_cache2state_lcot.py --dump-eval-details -r 20240820_190019 第一次用
+# python run.py eval_xrliu/eval_xrliu_abc_lcot.py --dump-eval-details --debug -r  调试用
+# python run.py eval_xrliu/eval_xrliu_abc_lcot.py --dump-eval-details -r 20240820_190019 第一次用

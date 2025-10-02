@@ -24,7 +24,7 @@ humaneval_eval_cfg = dict(
 
 humaneval_datasets = [
     dict(
-        abbr='openai_humaneval',
+        abbr='openai_humaneval_internal',
         type=HumanevalDataset,
         path='opencompass/humaneval',
         reader_cfg=humaneval_reader_cfg,

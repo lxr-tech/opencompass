@@ -469,8 +469,11 @@ class LlamaFlashAttention2(LlamaAttention):
         key_states = key_states.transpose(1, 2)
         value_states = value_states.transpose(1, 2)
 
-        if self.config.mask_dim_config is not None:
-            dim_c = math.ceil(math.log(self.config.rope_scaling['original_max_position_embeddings'] / (2. * math.pi)) / math.log(self.config.rope_theta) * self.head_dim / 2) * 2
+        if self.config.mask_dim_config is not None and self.config.mask_dim_config['noise_std'] > 0:
+            try:
+                dim_c = math.ceil(math.log(self.config.rope_scaling['original_max_position_embeddings'] / (2. * math.pi)) / math.log(self.config.rope_theta) * self.head_dim / 2) * 2
+            except:
+                dim_c = self.head_dim // 2
             start_dim = self.config.mask_dim_config.get('start_dim', dim_c)
             end_dim = self.config.mask_dim_config.get('end_dim', self.head_dim)
             noise_std = self.config.mask_dim_config.get('noise_std', 1)

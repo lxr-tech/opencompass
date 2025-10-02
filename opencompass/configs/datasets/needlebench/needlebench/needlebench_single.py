@@ -54,14 +54,14 @@ needlebench_eval_cfg = dict(
     pred_role='BOT',
 )
 
-context_lengths = list([4000, 8000, 16000, 24000, 32000, ])  # 2000, 64000, 128000
+context_lengths = list([2000, 4000, 8000, 16000, 24000, 32000, ])  # 64000, 128000
 # context_lengths = list([100000, 200000, 400000, 600000, 800000, 1000000])
 
 base_path = 'opencompass/needlebench'
 file_list = ['en_un_asr.jsonl']  #  PaulGrahamEssays _xrliu
 needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
-# depths_list = [0, 20, 40, 60, 80, 100, ]  # 
+# depths_list = [0, 20, 40, 60, 80, 100, ]  # 10, 20, 30, 
 depths_list = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 for original_context_length in context_lengths:

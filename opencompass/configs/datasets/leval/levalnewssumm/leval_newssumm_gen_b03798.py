@@ -35,7 +35,7 @@ LEval_newssumm_datasets = [
     dict(
         type=LEvalNewsSummDataset,
         abbr='LEval_news_summ',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='news_summ',
         reader_cfg=LEval_newssumm_reader_cfg,
         infer_cfg=LEval_newssumm_infer_cfg,

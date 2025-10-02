@@ -7,7 +7,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 babiLong_2k_datasets = []
 split_name='2k'
 max_seq_len = 2*1024
-tasks = ['qa1', 'qa2', 'qa3', 'qa4', 'qa5', 'qa6', 'qa7', 'qa8', 'qa9', 'qa10']
+tasks = ['qa1', 'qa2', 'qa3', 'qa4', 'qa5', 'qa6', 'qa7', 'qa8', 'qa9', 'qa10']  # 
 
 
 for task in tasks:
@@ -24,12 +24,12 @@ for task in tasks:
                 template=dict(
                     round=[
                         dict(role='HUMAN', prompt='{prompt}'),
-                        dict(role='BOT', prompt='{answer}\n'),
+                        # dict(role='BOT', prompt='{answer}\n'),
                     ]
                 ),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer， max_seq_len=max_seq_len),
+            inferencer=dict(type=GenInferencer, max_seq_len=max_seq_len),
         ),
         'eval_cfg': dict(
             evaluator=dict(type=BabiLongEvaluator),

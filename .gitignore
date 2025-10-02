@@ -136,3 +136,6 @@ turbomind/
 core.*
 
 *.ipynb*
+
+eval_xrliu/*.sh
+eval_xrliu/waste

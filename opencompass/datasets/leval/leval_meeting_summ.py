@@ -14,7 +14,7 @@ class LEvalMeetingSummDataset(BaseDataset):
         if 'data_files' in kwargs:
             kwargs['data_files'] = get_data_path(kwargs['data_files'],
                                                  local_mode=True)
-        dataset = load_dataset(**kwargs)
+        dataset = load_dataset(**kwargs, trust_remote_code=True)
         split = 'test'
         raw_data = []
         for i in range(len(dataset[split])):

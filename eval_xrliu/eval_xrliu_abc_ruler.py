@@ -5,24 +5,30 @@ from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 from opencompass.models import HuggingFaceBaseModel
 
 with read_base():
-    from opencompass.configs.datasets.needlebench.needlebench.needlebench import needlebench_origin_en_datasets
-    # from opencompass.configs.datasets.needlebench.needlebench.needlebench import needlebench_parallel_en_datasets
-    from opencompass.configs.summarizers.needlebench import needlebench_summarizer as summarizer
+    from opencompass.configs.datasets.ruler.ruler_4k_gen import ruler_datasets as ruler_datasets_4k
+    from opencompass.configs.datasets.ruler.ruler_8k_gen import ruler_datasets as ruler_datasets_8k
+    from opencompass.configs.datasets.ruler.ruler_16k_gen import ruler_datasets as ruler_datasets_16k
+    # from opencompass.configs.datasets.ruler.ruler_32k_gen import ruler_datasets as ruler_datasets_32k
 
 datasets = []
-datasets += needlebench_origin_en_datasets
-
-is_single_niah = (len([key for key in list(locals()) if key.__contains__('parallel') and key.endswith('datasets')]) == 0)
+datasets += ruler_datasets_4k
+datasets += ruler_datasets_8k
+datasets += ruler_datasets_16k
+# datasets += ruler_datasets_32k
 
 num_gpus = {
     'llama3_8b': 1, 'llama3_8b_chat': 1, 
 
     'llama3_1_8b': 1, 'llama3_1_8b_chat': 1, 'llama3_2_3b': 1, 'llama3_2_3b_chat': 1, 
-
+    
     'qwen3_4b_base': 1, 'qwen3_4b': 1, 'qwen3_8b_base': 1, 'qwen3_8b': 1, 
 
     'qwen2_5_7b': 1, 'qwen2_5_7b_chat': 1, 'qwen2_5_3b': 1, 'qwen2_5_3b_chat': 1, 
     'qwen2_5_1b': 1, 'qwen2_5_1b_chat': 1, 'qwen2_5_500m': 1, 
+    
+    'qwen2_5_7b_long': 1, 'qwen2_5_14b_long': 2, 
+
+    'internlm2_5_7b': 1, 'internlm3_8b_chat': 1, 
 
     'qwen2_5_32b': 4, 'qwen2_5_32b_chat': 4, 'qwq_32b': 4, 'r1_distill_32b': 4, 
 }
@@ -49,6 +55,11 @@ models = [
     # ('qwen2_5_7b', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B/'), 
     # ('qwen2_5_7b_chat', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B-Instruct/'), 
 
+    # ('qwen2_5_7b_long', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-7B-Instruct-1M/'), 
+    # ('qwen2_5_14b_long', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-14B-Instruct-1M/'), 
+
+    # ('internlm3_8b_chat', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/internlm3-8b-instruct/'), 
+
     # ('qwen2_5_32b', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-32B/'), 
     # ('qwen2_5_32b_chat', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Qwen2.5-32B-Instruct/'), 
     # ('qwq_32b', '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/QwQ-32B-Preview/'),
@@ -59,11 +70,12 @@ models = [
     dict(
         type=HuggingFaceBaseModel, abbr=abbr, path=path, 
         model_kwargs={'attn_implementation': 'flash_attention_2'}, 
-        max_out_len=50 if is_single_niah else 250, batch_size=1, run_cfg=dict(num_gpus=num_gpus[abbr.split('-')[0]]),
+        max_out_len=100, batch_size=1, 
+        run_cfg=dict(num_gpus=num_gpus[abbr.split('-')[0]], num_procs=num_gpus[abbr.split('-')[0]]),
     ) for abbr, path in models
 ]
 
-work_dir = './outputs_xrliu/niah/'
+work_dir = './outputs_xrliu/llm_ruler/'
 
 # File "/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/liuxiaoran-240108120089/projects_xrliu/opencompass/opencompass/openicl/icl_inferencer/icl_gen_inferencer.py", line 140, in inference
 #     entry, golds = list(zip(*datum))
@@ -73,7 +85,7 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),  # dict(type=NumWorkerPartitioner, num_worker=4),
     runner=dict(
         type=LocalRunner,
-        # max_num_workers=2, 
+        # max_num_workers=4, 
         task=dict(type=OpenICLInferTask), 
     ),
 )
@@ -93,8 +105,8 @@ eval = dict(
 #         [v for k, v in locals().items() if k.endswith('_summary_groups')], []
 #     ),
 # )
-
+ 
 # source /fs-computility/llm/liuxiaoran/.bashrc
 # conda activate /cpfs01/user/liuxiaoran/miniconda3/envs/llm-cuda12.1
-# python run.py eval_xrliu/eval_xrliu_niah.py --dump-eval-details --debug -r  调试用
-# python run.py eval_xrliu/eval_xrliu_niah.py --dump-eval-details -r 20240820_190019 第一次用
+# python run.py eval_xrliu/eval_xrliu_abc_ruler.py --dump-eval-details --debug -r  调试用
+# python run.py eval_xrliu/eval_xrliu_abc_ruler.py --dump-eval-details -r 20240820_190019 第一次用

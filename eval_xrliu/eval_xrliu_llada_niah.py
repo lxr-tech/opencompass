@@ -35,25 +35,6 @@ path_dict = {
     'dream_v0_7b_base': '/inspire/hdd/ws-8207e9e2-e733-4eec-a475-cfa1c36480ba/embodied-multimodality/public/downloaded_ckpts/Dream-v0-Base-7B/', 
 }
 
-"""
-    >>> 2 * np.ceil(128 / 2 * np.log(4096 / 2 / np.pi) / np.log(500000))
-    64.0
-    >>> (8192 / 2 / np.pi) ** (128 / 64) / 500000
-    3.3997747666863356
-    >>> (16384 / 2 / np.pi) ** (128 / 64) / 500000
-    13.599099066745342
-    >>> 2 * np.ceil(128 / 2 * np.log(2048 / 2 / np.pi) / np.log(1000000))
-    54.0
-    >>> (4096 / 2 / np.pi) ** (128 / 54) / 1000000
-    4.684347204817047
-    >>> (8192 / 2 / np.pi) ** (128 / 54) / 1000000
-    24.221534862197895
-"""
-
-#  20250606_131127: 
-#   no random_seed, max_out_len=64, 
-#   default: {'steps': 128, 'block_length': 32, 'temperature': 0., 'cfg_scale': 0., 'remasking': 'low_confidence'}
-
 models = [
     # ('llama_3_8b_base-o32', {}, {}, 32), 
     # ('llama_3_8b_base-o32-ntk4', {'scaling_factor': 4}, {}, 32), 
@@ -69,16 +50,6 @@ models = [
     # ('llada_8b_base-o32_b32_s8', {}, {'steps': 8, 'block_length': 32, }, 32), 
     # ('llada_8b_base-o32_b32_s16', {}, {'steps': 16, 'block_length': 32, }, 32), 
     # ('llada_8b_base-o32_b32_s32', {}, {'steps': 32, 'block_length': 32, }, 32), 
-    # # ('llada_8b_base-o32_b32_s64', {}, {'steps': 64, 'block_length': 32, }, 32), 
-    # # ('llada_8b_base-o32_b32_s128', {}, {'steps': 128, 'block_length': 32, }, 32), 
-
-    # ('llada_8b_base-o128_b128_s1', {}, {'steps': 1, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s4', {}, {'steps': 4, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s8', {}, {'steps': 8, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s16', {}, {'steps': 16, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s32', {}, {'steps': 32, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s64', {}, {'steps': 64, 'block_length': 128, }, 128), 
-    # ('llada_8b_base-o128_b128_s128', {}, {'steps': 128, 'block_length': 128, }, 128), 
 
     # ('llada_8b_chat-o32_b32_s1', {}, {'steps': 1, 'block_length': 32, }, 32), 
     # ('llada_8b_chat-o32_b32_s2', {}, {'steps': 2, 'block_length': 32, }, 32), 
@@ -86,44 +57,59 @@ models = [
     # ('llada_8b_chat-o32_b32_s8', {}, {'steps': 8, 'block_length': 32, }, 32), 
     # ('llada_8b_chat-o32_b32_s16', {}, {'steps': 16, 'block_length': 32, }, 32), 
     # ('llada_8b_chat-o32_b32_s32', {}, {'steps': 32, 'block_length': 32, }, 32), 
-    # # ('llada_8b_chat-o32_b32_s64', {}, {'steps': 64, 'block_length': 32, }, 32), 
-    # # ('llada_8b_chat-o32_b32_s128', {}, {'steps': 128, 'block_length': 32, }, 32), 
+
+    # ('llada_1_5_8b-o32_b32_s1', {}, {'steps': 1, 'block_length': 32, }, 32), 
+    # ('llada_1_5_8b-o32_b32_s2', {}, {'steps': 2, 'block_length': 32, }, 32), 
+    # ('llada_1_5_8b-o32_b32_s4', {}, {'steps': 4, 'block_length': 32, }, 32), 
+    # ('llada_1_5_8b-o32_b32_s8', {}, {'steps': 8, 'block_length': 32, }, 32), 
+    # ('llada_1_5_8b-o32_b32_s16', {}, {'steps': 16, 'block_length': 32, }, 32), 
+    # ('llada_1_5_8b-o32_b32_s32', {}, {'steps': 32, 'block_length': 32, }, 32), 
  
     # ('llada_8b_base-o32_b32_s32-ntk4', {'scaling_factor': 4}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_base-o32_b32_s32-ntk14', {'scaling_factor': 14}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_base-o32_b32_s32-ntk31', {'scaling_factor': 31}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_base-o32_b32_s32-ntk55', {'scaling_factor': 55}, {'steps': 32, 'block_length': 32, }, 32),
+    # ('llada_8b_base-o32_b32_s32-ntk_dyn', {'scaling_factor': -1, }, {'steps': 32, 'block_length': 32, }, 32),
+
+    # # ('llada_8b_base-o32_b32_s32-ntk31-log_auto', {'scaling_factor': 31, 'log_scale': -1}, {'steps': 32, 'block_length': 32, }, 32),
+    # # ('llada_8b_base-o32_b32_s32-ntk55-log_auto', {'scaling_factor': 55, 'log_scale': -1}, {'steps': 32, 'block_length': 32, }, 32),
+    # # ('llada_8b_base-o32_b32_s32-ntk_dyn-log_auto', {'scaling_factor': -1, 'log_scale': -1}, {'steps': 32, 'block_length': 32, }, 32),
 
     # ('llada_8b_chat-o32_b32_s32-ntk4', {'scaling_factor': 4}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_chat-o32_b32_s32-ntk14', {'scaling_factor': 14}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_chat-o32_b32_s32-ntk31', {'scaling_factor': 31}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_8b_chat-o32_b32_s32-ntk55', {'scaling_factor': 55}, {'steps': 32, 'block_length': 32, }, 32),
 
-    ('llada_1_5_8b-o32_b32_s1', {}, {'steps': 1, 'block_length': 32, }, 32), 
-    ('llada_1_5_8b-o32_b32_s2', {}, {'steps': 2, 'block_length': 32, }, 32), 
-    ('llada_1_5_8b-o32_b32_s4', {}, {'steps': 4, 'block_length': 32, }, 32), 
-    ('llada_1_5_8b-o32_b32_s8', {}, {'steps': 8, 'block_length': 32, }, 32), 
-    ('llada_1_5_8b-o32_b32_s16', {}, {'steps': 16, 'block_length': 32, }, 32), 
-    ('llada_1_5_8b-o32_b32_s32', {}, {'steps': 32, 'block_length': 32, }, 32), 
-
     # ('llada_1_5_8b-o32_b32_s32-ntk4', {'scaling_factor': 4}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_1_5_8b-o32_b32_s32-ntk14', {'scaling_factor': 14}, {'steps': 32, 'block_length': 32, }, 32),
     # ('llada_1_5_8b-o32_b32_s32-ntk31', {'scaling_factor': 31}, {'steps': 32, 'block_length': 32, }, 32),
 
-    # ('dream_v0_7b_base-o32_s1', {}, {'steps': 1, }, 32), 
-    # ('dream_v0_7b_base-o32_s8', {}, {'steps': 8, }, 32), 
-    # ('dream_v0_7b_base-o32_s16', {}, {'steps': 16, }, 32), 
-    # ('dream_v0_7b_base-o32_s32', {}, {'steps': 32, }, 32), 
+    ('dream_v0_7b_base-o32_s1-de', {}, {'steps': 1, }, 32), 
+    ('dream_v0_7b_base-o32_s2-de', {}, {'steps': 2, }, 32), 
+    ('dream_v0_7b_base-o32_s4-de', {}, {'steps': 4, }, 32), 
+    ('dream_v0_7b_base-o32_s8-de', {}, {'steps': 8, }, 32), 
+    ('dream_v0_7b_base-o32_s16-de', {}, {'steps': 16, }, 32), 
+    ('dream_v0_7b_base-o32_s32-de', {}, {'steps': 32, }, 32), 
  
+    # ('dream_v0_7b_base-o32_s32-de-ntk2', {'scaling_factor': 2}, {'steps': 32, }, 32), 
+    # ('dream_v0_7b_base-o32_s32-de-ntk5', {'scaling_factor': 5}, {'steps': 32, }, 32), 
+    # ('dream_v0_7b_base-o32_s32-de-ntk7', {'scaling_factor': 7}, {'steps': 32, }, 32), 
+
     # ('dream_v0_7b_base-o32_s32-ntk5', {'scaling_factor': 5}, {'steps': 32, }, 32), 
     # ('dream_v0_7b_base-o32_s32-ntk25', {'scaling_factor': 25}, {'steps': 32, }, 32), 
     # ('dream_v0_7b_base-o32_s32-ntk126', {'scaling_factor': 126}, {'steps': 32, }, 32), 
 
-    # ('dream_v0_7b_chat-o32_s1', {}, {'steps': 1, }, 32), 
-    # ('dream_v0_7b_chat-o32_s8', {}, {'steps': 8, }, 32), 
-    # ('dream_v0_7b_chat-o32_s16', {}, {'steps': 16, }, 32), 
-    # ('dream_v0_7b_chat-o32_s32', {}, {'steps': 32, }, 32), 
- 
+    ('dream_v0_7b_chat-o32_s1-de', {}, {'steps': 1, }, 32), 
+    ('dream_v0_7b_chat-o32_s2-de', {}, {'steps': 2, }, 32), 
+    ('dream_v0_7b_chat-o32_s4-de', {}, {'steps': 4, }, 32), 
+    ('dream_v0_7b_chat-o32_s8-de', {}, {'steps': 8, }, 32), 
+    ('dream_v0_7b_chat-o32_s16-de', {}, {'steps': 16, }, 32), 
+    ('dream_v0_7b_chat-o32_s32-de', {}, {'steps': 32, }, 32), 
+
+    # ('dream_v0_7b_chat-o32_s32-de-ntk2', {'scaling_factor': 2}, {'steps': 32, }, 32), 
+    # ('dream_v0_7b_chat-o32_s32-de-ntk5', {'scaling_factor': 5}, {'steps': 32, }, 32), 
+    # ('dream_v0_7b_chat-o32_s32-de-ntk7', {'scaling_factor': 7}, {'steps': 32, }, 32), 
+
     # ('dream_v0_7b_chat-o32_s32-ntk5', {'scaling_factor': 5}, {'steps': 32, }, 32), 
     # ('dream_v0_7b_chat-o32_s32-ntk25', {'scaling_factor': 25}, {'steps': 32, }, 32), 
     # ('dream_v0_7b_chat-o32_s32-ntk126', {'scaling_factor': 126}, {'steps': 32, }, 32), 

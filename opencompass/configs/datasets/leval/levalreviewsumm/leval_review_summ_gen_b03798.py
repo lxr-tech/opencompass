@@ -35,7 +35,7 @@ LEval_review_summ_datasets = [
     dict(
         type=LEvalReviewSummDataset,
         abbr='LEval_review_summ',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='review_summ',
         reader_cfg=LEval_review_summ_reader_cfg,
         infer_cfg=LEval_review_summ_infer_cfg,

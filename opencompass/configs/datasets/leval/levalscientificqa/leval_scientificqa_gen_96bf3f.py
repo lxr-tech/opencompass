@@ -35,7 +35,7 @@ LEval_scientificqa_datasets = [
     dict(
         type=LEvalScientificQADataset,
         abbr='LEval_scientificqa',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='scientific_qa',
         reader_cfg=LEval_scientificqa_reader_cfg,
         infer_cfg=LEval_scientificqa_infer_cfg,

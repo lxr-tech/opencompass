@@ -35,7 +35,7 @@ LEval_financialqa_datasets = [
     dict(
         type=LEvalFinancialQADataset,
         abbr='LEval_financialqa',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='financial_qa',
         reader_cfg=LEval_financialqa_reader_cfg,
         infer_cfg=LEval_financialqa_infer_cfg,

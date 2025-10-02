@@ -37,7 +37,7 @@ LEval_tpo_datasets = [
     dict(
         type=LEvalTPODataset,
         abbr='LEval_tpo',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='tpo',
         reader_cfg=LEval_tpo_reader_cfg,
         infer_cfg=LEval_tpo_infer_cfg,

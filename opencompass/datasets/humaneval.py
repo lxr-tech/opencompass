@@ -204,6 +204,9 @@ def humaneval_internal_v2_postprocess(text: str):
         return_list.append(line)
     return '\n'.join(return_list)
 
+def humaneval_xrliu_v1_postprocess(text: str) -> str:
+    return text if text.find("```") == -1 else text[: text.find("```")]
+
 def humaneval_internal_v1_postprocess(text: str) -> str:
     """This is an advanced version of previous postprocess to handle more
     situations, better to use this one."""

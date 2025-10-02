@@ -35,7 +35,7 @@ LEval_multidocqa_datasets = [
     dict(
         type=LEvalMultidocQADataset,
         abbr='LEval_multidocqa',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='multidoc_qa',
         reader_cfg=LEval_multidocqa_reader_cfg,
         infer_cfg=LEval_multidocqa_infer_cfg,

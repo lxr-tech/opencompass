@@ -35,7 +35,7 @@ LEval_meetingsumm_datasets = [
     dict(
         type=LEvalMeetingSummDataset,
         abbr='LEval_meeting_summ',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='meeting_summ',
         reader_cfg=LEval_meetingsumm_reader_cfg,
         infer_cfg=LEval_meetingsumm_infer_cfg,

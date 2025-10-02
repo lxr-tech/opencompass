@@ -37,7 +37,7 @@ LEval_coursera_datasets = [
     dict(
         type=LEvalCourseraDataset,
         abbr='LEval_coursera',
-        path='L4NLP/LEval',
+        path='./data/L4NLP/LEval',
         name='coursera',
         reader_cfg=LEval_coursera_reader_cfg,
         infer_cfg=LEval_coursera_infer_cfg,

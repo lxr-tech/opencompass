@@ -220,18 +220,18 @@ class HuggingFacewithChatTemplate(BaseModel):
     def _load_model(self, path: str, kwargs: dict, peft_path: Optional[str] = None, peft_kwargs: dict = dict()):
         from transformers import AutoModel, AutoModelForCausalLM
 
-        DEFAULT_MODEL_KWARGS = dict(device_map='auto', trust_remote_code=True)
+        DEFAULT_MODEL_KWARGS = dict(trust_remote_code=True)  # device_map='auto', 
         model_kwargs = DEFAULT_MODEL_KWARGS
         model_kwargs.update(kwargs)
         model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
         self.logger.debug(f'using model_kwargs: {model_kwargs}')
-        if is_npu_available():
-            model_kwargs['device_map'] = 'npu'
+        # if is_npu_available():
+        #     model_kwargs['device_map'] = 'npu'
 
         try:
-            self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
+            self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs).cuda()
         except ValueError:
-            self.model = AutoModel.from_pretrained(path, **model_kwargs)
+            self.model = AutoModel.from_pretrained(path, **model_kwargs).cuda()
 
         if peft_path is not None:
             from peft import PeftModel
